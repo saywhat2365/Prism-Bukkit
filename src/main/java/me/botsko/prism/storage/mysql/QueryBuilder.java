@@ -11,7 +11,6 @@ abstract public class QueryBuilder {
     /**
 	 * 
 	 */
-    protected final Prism plugin;
     protected List<String> columns = new ArrayList<String>();
     protected List<String> conditions = new ArrayList<String>();
 
@@ -21,13 +20,6 @@ abstract public class QueryBuilder {
     protected QueryParameters parameters;
     protected boolean shouldGroup;
 
-    /**
-     * 
-     * @param plugin
-     */
-    public QueryBuilder(Prism plugin) {
-        this.plugin = plugin;
-    }
 
     /**
      * 
@@ -48,9 +40,8 @@ abstract public class QueryBuilder {
 
         query += ";";
 
-        if( plugin.getConfig().getBoolean( "prism.debug" ) ) {
-            Prism.debug( query );
-        }
+        Prism.debug( query );
+
 
         return query;
 

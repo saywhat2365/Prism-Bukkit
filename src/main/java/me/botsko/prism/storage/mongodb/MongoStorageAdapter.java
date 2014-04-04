@@ -224,7 +224,6 @@ public class MongoStorageAdapter implements StorageAdapter {
                 // Begin new batch
                 List<DBObject> documents = new ArrayList<DBObject>();
 
-                int i = 0;
                 for( Handler a : actions){
 
                     if( a == null )
@@ -251,7 +250,7 @@ public class MongoStorageAdapter implements StorageAdapter {
                 }
 
                 DBCollection coll = getMongoCollection("prismData");
-                WriteResult res = coll.insert( documents );
+                coll.insert( documents );
 //                Prism.debug("Recorder logged " + res.getN() + " new actions.");
 
                 // Save the current count to the queue for short historical data
@@ -360,5 +359,22 @@ public class MongoStorageAdapter implements StorageAdapter {
         
         return query;
         
+    }
+
+    
+    /**
+     * 
+     */
+    @Override
+    public boolean testConnection() throws Exception {
+        try {
+            if( getMongo() == null ) {
+                throw new Exception( "Pool returned NULL instead of a valid connection." );
+            }
+            getMongo().getDB("prism");
+        } catch ( final MongoException e ) {
+            throw new Exception( "[InternalAffairs] Error: " + e.getMessage() );
+        }
+        return true;
     }
 }

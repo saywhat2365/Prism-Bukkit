@@ -27,4 +27,6 @@ public interface StorageAdapter {
 	
 	public void close();
 	
+	public boolean testConnection() throws Exception;
+	
 }

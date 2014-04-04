@@ -15,9 +15,7 @@ import me.botsko.elixr.TypeUtils;
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.ActionType;
 import me.botsko.prism.actionlibs.QueryParameters;
-import me.botsko.prism.actionlibs.QueryResult;
 import me.botsko.prism.actionlibs.RecordingManager;
-import me.botsko.prism.actionlibs.RecordingQueue;
 import me.botsko.prism.actions.Handler;
 import me.botsko.prism.storage.StorageAdapter;
 import me.botsko.prism.storage.StorageWriteResponse;
@@ -76,7 +74,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
             }
         }
         
-        this.qb = new SelectQueryBuilder( config );
+        this.qb = new SelectQueryBuilder( prismActions );
 
         return true;
 		
@@ -289,7 +287,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
 		Connection conn = null;
         Statement s = null;
         try {
-            final DeleteQueryBuilder dqb = new DeleteQueryBuilder( plugin );
+            final DeleteQueryBuilder dqb = new DeleteQueryBuilder( prismActions );
             // Build conditions based off final args
             final String query = dqb.getQuery( parameters, false );
             conn = dbc();
@@ -312,6 +310,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                     conn.close();
                 } catch ( final SQLException ignored ) {}
         }
+        return total_rows_affected;
 	}
 	
 	/**
@@ -351,9 +350,9 @@ public class MysqlStorageAdapter implements StorageAdapter {
                         Prism.log( "Prism database error. Connection should be there but it's not. Leaving actions to log in queue." );
                     }
                     RecordingManager.failedDbConnectionCount++;
-                    sender.sendMessage( Prism.messenger
-                            .playerError( "Database connection was closed, please wait and try again." ) );
-                    return new QueryResult( actions, parameters );
+//                    sender.sendMessage( Prism.messenger
+//                            .playerError( "Database connection was closed, please wait and try again." ) );
+                    return null;
                 } else {
                     RecordingManager.failedDbConnectionCount = 0;
                 }
@@ -408,7 +407,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                         }
 
                         // Set all shared values
-                        baseHandler.setPlugin( plugin );
+                        baseHandler.setPlugin( Bukkit.getPluginManager().getPlugin( "Prism" ) );
                         baseHandler.setType( actionType );
                         baseHandler.setId( rs.getInt( 1 ) );
                         baseHandler.setUnixEpoch( rs.getString( 2 ) );
@@ -457,6 +456,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                     } catch ( final SQLException ignored ) {}
             }
         }
+        return actions;
 	}
 	
 	/**
@@ -482,13 +482,13 @@ public class MysqlStorageAdapter implements StorageAdapter {
                         Prism.log( "Prism database error. Connection should be there but it's not. Leaving actions to log in queue." );
                     }
                     RecordingManager.failedDbConnectionCount++;
-                    if( RecordingManager.failedDbConnectionCount > plugin.getConfig().getInt(
-                            "prism.database.max-failures-before-wait" ) ) {
-                        Prism.log( "Too many problems connecting. Giving up for a bit." );
-                        scheduleNextRecording();
-                    }
+//                    if( RecordingManager.failedDbConnectionCount > plugin.getConfig().getInt(
+//                            "prism.database.max-failures-before-wait" ) ) {
+//                        Prism.log( "Too many problems connecting. Giving up for a bit." );
+//                        scheduleNextRecording();
+//                    }
                     Prism.debug( "Database connection still missing, incrementing count." );
-                    return;
+                    return null;
                 } else {
                     RecordingManager.failedDbConnectionCount = 0;
                 }
@@ -559,7 +559,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                 }
 
                 // Save the current count to the queue for short historical data
-                plugin.queueStats.addRunCount( actionsRecorded );
+//                plugin.queueStats.addRunCount( actionsRecorded );
 
                 // Insert extra data
                 insertExtraData( extraDataQueue, s.getGeneratedKeys() );
@@ -577,6 +577,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                     conn.close();
                 } catch ( final SQLException ignored ) {}
         }
+        return null;
 	}
 	
 	
@@ -976,5 +977,34 @@ public class MysqlStorageAdapter implements StorageAdapter {
                     conn.close();
                 } catch ( final SQLException e ) {}
         }
+    }
+    
+    
+    /**
+     * @throws Exception  
+     * 
+     */
+    @Override
+    public boolean testConnection() throws Exception {
+        Connection conn = null;
+        try {
+
+            conn = dbc();
+            if( conn == null ) {
+                throw new Exception( "Pool returned NULL instead of a valid connection." );
+            } else if( conn.isClosed() ) {
+                throw new Exception( "Pool returned an already closed connection." );
+            } else if( conn.isValid( 5 ) ) {
+                return true;
+            }
+        } catch ( final SQLException e ) {
+            throw new Exception( "[InternalAffairs] Error: " + e.getMessage() );
+        } finally {
+            if( conn != null )
+                try {
+                    conn.close();
+                } catch ( final SQLException e ) {}
+        }
+        return false;
     }
 }

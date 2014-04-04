@@ -1,15 +1,16 @@
 package me.botsko.prism.storage.mysql;
 
-import me.botsko.prism.Prism;
+import java.util.HashMap;
 
 public class DeleteQueryBuilder extends SelectQueryBuilder {
 
+    
     /**
      * 
-     * @param plugin
+     * @param prismActions
      */
-    public DeleteQueryBuilder(Prism plugin) {
-        super( plugin );
+    public DeleteQueryBuilder(HashMap<String, Integer> prismActions) {
+        super( prismActions );
     }
 
     /**

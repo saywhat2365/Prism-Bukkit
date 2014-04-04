@@ -19,6 +19,7 @@ import me.botsko.prism.parameters.*;
 import me.botsko.prism.purge.PurgeManager;
 import me.botsko.prism.storage.SettingsStorageAdapter;
 import me.botsko.prism.storage.StorageAdapter;
+import me.botsko.prism.storage.mongodb.MongoStorageAdapter;
 import me.botsko.prism.storage.mysql.MysqlStorageAdapter;
 import me.botsko.prism.wands.Wand;
 
@@ -133,8 +134,11 @@ public class Prism extends JavaPlugin {
         }
 
         // Load current database storage engine
-        if( config.getString("").equals("mysql") ){
+        if( config.getString("prism.database.engine").equals("mysql") ){
         	storageAdapter = new MysqlStorageAdapter();
+        }
+        else if( config.getString("prism.database.engine").equals("mongodb") ){
+            storageAdapter = new MongoStorageAdapter();
         }
 
         // Establish connection to database server

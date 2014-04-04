@@ -8,19 +8,22 @@ import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import me.botsko.elixr.TypeUtils;
-import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.MatchRule;
 import me.botsko.prism.appliers.PrismProcessType;
 
 public class SelectQueryBuilder extends QueryBuilder {
-
+    
+    private HashMap<String, Integer> prismActions;
+    
+    
     /**
      * 
-     * @param plugin
+     * @param prismActions
      */
-    public SelectQueryBuilder(Prism plugin) {
-        super( plugin );
+    public SelectQueryBuilder( HashMap<String, Integer> prismActions ){
+        this.prismActions = prismActions;
     }
+
 
     /**
      * 
@@ -128,10 +131,10 @@ public class SelectQueryBuilder extends QueryBuilder {
 
         // Build IDs for prism process actions
         final ArrayList<String> prismActionIds = new ArrayList<String>();
-        for ( final Entry<String, Integer> entry : Prism.prismActions.entrySet() ) {
+        for ( final Entry<String, Integer> entry : prismActions.entrySet() ) {
             if( entry.getKey().contains( "prism" ) ) {
                 containsPrismProcessType = true;
-                prismActionIds.add( "" + Prism.prismActions.get( entry.getKey() ) );
+                prismActionIds.add( "" + prismActions.get( entry.getKey() ) );
             }
         }
 
@@ -142,10 +145,10 @@ public class SelectQueryBuilder extends QueryBuilder {
             final ArrayList<String> excludeIds = new ArrayList<String>();
             for ( final Entry<String, MatchRule> entry : action_types.entrySet() ) {
                 if( entry.getValue().equals( MatchRule.INCLUDE ) ) {
-                    includeIds.add( "" + Prism.prismActions.get( entry.getKey() ) );
+                    includeIds.add( "" + prismActions.get( entry.getKey() ) );
                 }
                 if( entry.getValue().equals( MatchRule.EXCLUDE ) ) {
-                    excludeIds.add( "" + Prism.prismActions.get( entry.getKey() ) );
+                    excludeIds.add( "" + prismActions.get( entry.getKey() ) );
                 }
             }
             // Include IDs

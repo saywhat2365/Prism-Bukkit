@@ -1,6 +1,7 @@
 package me.botsko.prism.storage.mysql;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.QueryParameters;
@@ -9,10 +10,10 @@ public class ActionReportQueryBuilder extends SelectQueryBuilder {
 
     /**
      * 
-     * @param plugin
+     * @param prismActions
      */
-    public ActionReportQueryBuilder(Prism plugin) {
-        super( plugin );
+    public ActionReportQueryBuilder(HashMap<String, Integer> prismActions) {
+        super( prismActions );
     }
 
     /**
@@ -35,9 +36,7 @@ public class ActionReportQueryBuilder extends SelectQueryBuilder {
 
         query += ";";
 
-        if( plugin.getConfig().getBoolean( "prism.debug" ) ) {
-            Prism.debug( query );
-        }
+        Prism.debug( query );
 
         return query;
 
