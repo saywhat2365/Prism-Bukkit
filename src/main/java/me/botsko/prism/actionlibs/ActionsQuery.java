@@ -18,7 +18,6 @@ public class ActionsQuery {
 	 */
     private final Prism plugin;
 
-
     /**
      * 
      * @param plugin

@@ -40,7 +40,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
     private HashMap<String, Integer> prismPlayers = new HashMap<String, Integer>();
     private HashMap<String, Integer> prismActions = new HashMap<String, Integer>();
     
-    
 	/**
 	 * 
 	 */
@@ -78,7 +77,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
         return true;
 		
 	}
-	
 	
     /**
      * 
@@ -119,52 +117,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
 //     }
 //     pool = initDbPool();
 // }
-    
-//    /**
-//     * 
-//     * @return
-//     */
-//    public DataSource getPool() {
-//        return Prism.pool;
-//    }
-    
-    
 
-//    /**
-//     * Attempt to reconnect to the database
-//     * 
-//     * @return
-//     * @throws SQLException
-//     */
-//    protected boolean attemptToRescueConnection(SQLException e) throws SQLException {
-//        if( e.getMessage().contains( "connection closed" ) ) {
-//            rebuildPool();
-//            if( pool != null ) {
-//                final Connection conn = dbc();
-//                if( conn != null && !conn.isClosed() ) { return true; }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    /**
-//	 * 
-//	 */
-//    public void handleDatabaseException(SQLException e) {
-//        // Attempt to rescue
-//        try {
-//            if( attemptToRescueConnection( e ) ) { return; }
-//        } catch ( final SQLException e1 ) {}
-//        log( "Database connection error: " + e.getMessage() );
-//        if( e.getMessage().contains( "marked as crashed" ) ) {
-//            final String[] msg = new String[2];
-//            msg[0] = "If MySQL crashes during write it may corrupt it's indexes.";
-//            msg[1] = "Try running `CHECK TABLE prism_data` and then `REPAIR TABLE prism_data`.";
-//            logSection( msg );
-//        }
-//        e.printStackTrace();
-//    }
-    
     /**
      * 
      */
@@ -275,7 +228,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
         }
         return con;
     }
-	
 
 	/**
 	 * 
@@ -327,7 +279,8 @@ public class MysqlStorageAdapter implements StorageAdapter {
 	 */
 	@Override
 	public List<Handler> query( QueryParameters parameters, boolean shouldGroup ) {
-		// Pull results
+	    
+		// Any found actions
         final List<Handler> actions = new ArrayList<Handler>();
 
         // Build conditions based off final args
@@ -349,8 +302,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
                         Prism.log( "Prism database error. Connection should be there but it's not. Leaving actions to log in queue." );
                     }
                     RecordingManager.failedDbConnectionCount++;
-//                    sender.sendMessage( Prism.messenger
-//                            .playerError( "Database connection was closed, please wait and try again." ) );
                     return null;
                 } else {
                     RecordingManager.failedDbConnectionCount = 0;
@@ -385,11 +336,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
 
                     if( actionType == null )
                         continue;
-
-                    // Prism.debug("Important: Action type '" + rs.getString(3)
-                    // +
-                    // "' has no official handling class, will be shown as generic."
-                    // );
 
                     try {
 
@@ -481,11 +427,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
                         Prism.log( "Prism database error. Connection should be there but it's not. Leaving actions to log in queue." );
                     }
                     RecordingManager.failedDbConnectionCount++;
-//                    if( RecordingManager.failedDbConnectionCount > plugin.getConfig().getInt(
-//                            "prism.database.max-failures-before-wait" ) ) {
-//                        Prism.log( "Too many problems connecting. Giving up for a bit." );
-//                        scheduleNextRecording();
-//                    }
                     Prism.debug( "Database connection still missing, incrementing count." );
                     return null;
                 } else {
@@ -497,7 +438,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                 s = conn.prepareStatement(
                         "INSERT INTO prism_data (epoch,action_id,player_id,world_id,block_id,block_subid,old_block_id,old_block_subid,x,y,z) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                         Statement.RETURN_GENERATED_KEYS );
-                int i = 0;
+
                 for( Handler a : actions ){
 
                     if( conn.isClosed() ) {
@@ -558,7 +499,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                 }
 
                 // Save the current count to the queue for short historical data
-//                plugin.queueStats.addRunCount( actionsRecorded );
+                Prism.queueStats.addRunCount( actionsRecorded );
 
                 // Insert extra data
                 insertExtraData( extraDataQueue, s.getGeneratedKeys() );
@@ -678,12 +619,10 @@ public class MysqlStorageAdapter implements StorageAdapter {
         }
 	}
 	
-	
-	
 	/**
 	 * 
 	 */
-    protected void cacheActionPrimaryKeys() {
+    private void cacheActionPrimaryKeys() {
 
         Connection conn = null;
         PreparedStatement s = null;
@@ -766,7 +705,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
     /**
 	 * 
 	 */
-    protected void cacheWorldPrimaryKeys() {
+    private void cacheWorldPrimaryKeys() {
 
         Connection conn = null;
         PreparedStatement s = null;
@@ -898,10 +837,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
 	 */
     public void cachePlayerPrimaryKey(final String playerName) {
 
-        // getServer().getScheduler().runTaskAsynchronously(this, new
-        // Runnable(){
-        // public void run(){
-
         Connection conn = null;
         PreparedStatement s = null;
         ResultSet rs = null;
@@ -934,8 +869,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
                     conn.close();
                 } catch ( final SQLException e ) {}
         }
-        // }
-        // });
     }
 
     /**

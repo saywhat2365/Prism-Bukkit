@@ -83,7 +83,7 @@ public class Prism extends JavaPlugin {
     public ConcurrentHashMap<String, QueryResult> cachedQueries = new ConcurrentHashMap<String, QueryResult>();
     public ConcurrentHashMap<Location, Long> alertedBlocks = new ConcurrentHashMap<Location, Long>();
     public static TimeTaken eventTimer;
-    public QueueStats queueStats;
+    public static QueueStats queueStats;
     public BukkitTask recordingTask;
     public int total_records_affected = 0;
 

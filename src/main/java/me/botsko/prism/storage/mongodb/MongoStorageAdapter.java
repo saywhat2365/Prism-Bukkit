@@ -74,7 +74,7 @@ public class MongoStorageAdapter implements StorageAdapter {
         
         database = config.getString("prism.mongodb.database");
         
-     // Initialize database
+        // Initialize database
         try {
             mongoClient = new MongoClient(config.getString( "prism.mongodb.hostname" ),config.getInt( "prism.mongodb.port" ));
             // boolean auth = db.authenticate(myUserName, myPassword);
@@ -241,11 +241,11 @@ public class MongoStorageAdapter implements StorageAdapter {
                 }
 
                 DBCollection coll = getMongoCollection("prismData");
-                coll.insert( documents );
-//                Prism.debug("Recorder logged " + res.getN() + " new actions.");
+                WriteResult res = coll.insert( documents );
+                Prism.debug("Recorder logged " + res.getN() + " new actions.");
 
                 // Save the current count to the queue for short historical data
-//                plugin.queueStats.addRunCount( res.getN() );
+                Prism.queueStats.addRunCount( res.getN() );
 
             }
         } catch ( final Exception e ) {
@@ -353,7 +353,6 @@ public class MongoStorageAdapter implements StorageAdapter {
         return query;
         
     }
-
     
     /**
      * 

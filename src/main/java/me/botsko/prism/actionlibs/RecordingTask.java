@@ -77,9 +77,6 @@ public class RecordingTask implements Runnable {
 	 */
     @Override
     public void run() {
-//        if( RecordingManager.failedDbConnectionCount > 5 ) {
-//            plugin.rebuildPool(); // force rebuild pool after several failures
-//        }
         save();
         scheduleNextRecording();
     }
