@@ -1,4 +1,4 @@
-package me.botsko.prism.database.mysql;
+package me.botsko.prism.storage.mysql;
 
 import me.botsko.prism.Prism;
 

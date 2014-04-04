@@ -119,11 +119,6 @@ public class PrismCommands extends Executor {
         addSub( "recorder", "prism.recorder" ).allowConsole().setHandler( new RecorderCommand( prism ) );
 
         /**
-         * /prism undo
-         */
-        addSub( "undo", "prism.rollback" ).setHandler( new UndoCommand( prism ) );
-
-        /**
          * /prism view
          */
         addSub( new String[] { "view", "v" }, "prism.view" ).setMinArgs( 1 ).setHandler( new ViewCommand( prism ) );

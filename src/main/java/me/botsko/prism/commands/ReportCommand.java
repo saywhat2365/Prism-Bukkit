@@ -10,9 +10,10 @@ import me.botsko.prism.appliers.PrismProcessType;
 import me.botsko.prism.commandlibs.CallInfo;
 import me.botsko.prism.commandlibs.PreprocessArgs;
 import me.botsko.prism.commandlibs.SubHandler;
-import me.botsko.prism.database.mysql.ActionReportQueryBuilder;
-import me.botsko.prism.database.mysql.BlockReportQueryBuilder;
+import me.botsko.prism.storage.mysql.ActionReportQueryBuilder;
+import me.botsko.prism.storage.mysql.BlockReportQueryBuilder;
 import me.botsko.prism.utils.MiscUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

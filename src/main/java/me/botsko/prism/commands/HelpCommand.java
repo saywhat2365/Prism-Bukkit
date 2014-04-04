@@ -50,7 +50,6 @@ public class HelpCommand implements SubHandler {
         sender.sendMessage( Prism.messenger.playerHelp( "(w|wand) rollback", "Toggle the rollback wand." ) );
         sender.sendMessage( Prism.messenger.playerHelp( "(w|wand) restore", "Toggle the restore wand." ) );
         sender.sendMessage( Prism.messenger.playerHelp( "(w|wand) off", "Disable current wand." ) );
-        sender.sendMessage( Prism.messenger.playerHelp( "undo", "Undo a drain." ) );
         sender.sendMessage( Prism.messenger.playerHelp( "ex (r)", "Extinguish fires within a (r)adius." ) );
         sender.sendMessage( Prism.messenger.playerHelp( "drain (r)", "Drain water/lava within a (r)adius." ) );
         sender.sendMessage( Prism.messenger.playerHelp( "delete (params)",

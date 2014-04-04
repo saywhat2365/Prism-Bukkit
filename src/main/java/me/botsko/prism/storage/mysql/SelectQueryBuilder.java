@@ -1,4 +1,4 @@
-package me.botsko.prism.database.mysql;
+package me.botsko.prism.storage.mysql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,6 @@ import me.botsko.elixr.TypeUtils;
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.MatchRule;
 import me.botsko.prism.appliers.PrismProcessType;
-import me.botsko.prism.database.QueryBuilder;
 
 public class SelectQueryBuilder extends QueryBuilder {
 

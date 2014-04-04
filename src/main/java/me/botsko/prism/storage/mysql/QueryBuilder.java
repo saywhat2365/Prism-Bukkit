@@ -1,4 +1,4 @@
-package me.botsko.prism.database;
+package me.botsko.prism.storage.mysql;
 
 import java.util.ArrayList;
 import java.util.List;

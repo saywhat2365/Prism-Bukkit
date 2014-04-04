@@ -33,6 +33,7 @@ public class PrismConfig extends ConfigBase {
         config.addDefault( "prism.allow-metrics", true );
 
         // Database
+        config.addDefault( "prism.database.engine", "mysql" );
         config.addDefault( "prism.database.max-pool-connections", 20 );
         config.addDefault( "prism.database.pool-initial-size", 10 );
         config.addDefault( "prism.database.max-idle-connections", 10 );
