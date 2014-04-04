@@ -47,8 +47,9 @@ import java.util.logging.Logger;
 public class Prism extends JavaPlugin {
 
     /**
-     * Protected/private
+     * Private
      */
+    private Prism prism;
     private static String plugin_name;
     private String plugin_version;
     private static MaterialAliases items;
@@ -64,7 +65,6 @@ public class Prism extends JavaPlugin {
     private static HashMap<String, PrismParameterHandler> paramHandlers = new HashMap<String, PrismParameterHandler>();
     private final ScheduledThreadPoolExecutor schedulePool = new ScheduledThreadPoolExecutor( 1 );
     private final ScheduledThreadPoolExecutor recordingMonitorTask = new ScheduledThreadPoolExecutor( 1 );
-    // private ScheduledFuture<?> scheduledPurgeExecutor;
     private PurgeManager purgeManager;
     private static StorageAdapter storageAdapter = null;
     private static SettingsStorageAdapter settingsStorageAdapter = null;
@@ -72,11 +72,9 @@ public class Prism extends JavaPlugin {
     /**
      * Public
      */
-    public Prism prism;
     public static Messenger messenger;
     public static FileConfiguration config;
     public static WorldEditPlugin plugin_worldEdit = null;
-    public ActionsQuery actionsQuery;
     public OreMonitor oreMonitor;
     public UseMonitor useMonitor;
     public static ConcurrentHashMap<String, Wand> playersWithActiveTools = new ConcurrentHashMap<String, Wand>();
@@ -218,7 +216,6 @@ public class Prism extends JavaPlugin {
 
             // Init re-used classes
             messenger = new Messenger( plugin_name );
-            actionsQuery = new ActionsQuery( this );
             oreMonitor = new OreMonitor( this );
             useMonitor = new UseMonitor( this );
 
@@ -259,7 +256,7 @@ public class Prism extends JavaPlugin {
      * Load configuration and language files
      */
     @SuppressWarnings("unchecked")
-    public void loadConfig() {
+    private void loadConfig() {
         final PrismConfig mc = new PrismConfig( this );
         config = mc.getConfig();
 
@@ -315,7 +312,7 @@ public class Prism extends JavaPlugin {
     /**
 	 * 
 	 */
-    public void checkPluginDependancies() {
+    private void checkPluginDependancies() {
 
         // HeroChat
         final Plugin herochat = getServer().getPluginManager().getPlugin( "Herochat" );
@@ -436,7 +433,7 @@ public class Prism extends JavaPlugin {
     /**
 	 * 
 	 */
-    public void endExpiredQueryCaches() {
+    private void endExpiredQueryCaches() {
         getServer().getScheduler().scheduleSyncRepeatingTask( this, new Runnable() {
 
             @Override
@@ -456,7 +453,7 @@ public class Prism extends JavaPlugin {
     /**
 	 * 
 	 */
-    public void endExpiredPreviews() {
+    private void endExpiredPreviews() {
         getServer().getScheduler().scheduleSyncRepeatingTask( this, new Runnable() {
 
             @Override
@@ -481,7 +478,7 @@ public class Prism extends JavaPlugin {
     /**
 	 * 
 	 */
-    public void removeExpiredLocations() {
+    private void removeExpiredLocations() {
         getServer().getScheduler().scheduleSyncRepeatingTask( this, new Runnable() {
 
             @Override
@@ -514,7 +511,7 @@ public class Prism extends JavaPlugin {
     /**
 	 * 
 	 */
-    public void launchScheduledPurgeManager() {
+    private void launchScheduledPurgeManager() {
         final List<String> purgeRules = getConfig().getStringList( "prism.db-records-purge-rules" );
         purgeManager = new PurgeManager( this, purgeRules );
         // scheduledPurgeExecutor =
@@ -525,7 +522,7 @@ public class Prism extends JavaPlugin {
     /**
 	 * 
 	 */
-    public void launchInternalAffairs() {
+    private void launchInternalAffairs() {
         final InternalAffairs recordingMonitor = new InternalAffairs( this );
         recordingMonitorTask.scheduleAtFixedRate( recordingMonitor, 0, 5, TimeUnit.MINUTES );
     }

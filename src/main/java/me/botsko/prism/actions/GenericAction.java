@@ -171,6 +171,25 @@ public class GenericAction implements Handler {
     public String getDisplayDate() {
         return display_date;
     }
+    
+    /*
+     * (non-Javadoc)
+     * @see me.botsko.prism.actions.Handler#setDisplayDate(java.lang.String)
+     */
+    @Override
+    public void setUnixEpoch(Long epoch) {
+
+        this.epoch = String.valueOf(epoch);
+
+        final Date action_time = new Date( epoch * 1000 );
+
+        final SimpleDateFormat date = new SimpleDateFormat( "yy/MM/dd" );
+        this.display_date = date.format( action_time );
+
+        final SimpleDateFormat time = new SimpleDateFormat( "h:m:sa" );
+        this.display_time = time.format( action_time );
+
+    }
 
     /*
      * (non-Javadoc)

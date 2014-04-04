@@ -30,17 +30,8 @@ import me.botsko.prism.storage.StorageWriteResponse;
 public class MongoStorageAdapter implements StorageAdapter {
     
     private MongoClient mongoClient = null;
-    
     private String database;
   
-
-    /**
-     * 
-     * @return
-     */
-    private MongoClient getMongo(){
-        return mongoClient;
-    }
 
     /**
      * 
@@ -67,7 +58,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     private DB getMongoDB(){
         DB db = null;
         try {
-            db = getMongo().getDB(database);
+            db = mongoClient.getDB(database);
             return db;
         } catch( MongoException e ){
             e.printStackTrace();
@@ -178,7 +169,7 @@ public class MongoStorageAdapter implements StorageAdapter {
                         // Set all shared values
                         baseHandler.setPlugin( Bukkit.getPluginManager().getPlugin( "Prism" ) );
                         baseHandler.setType( actionType );
-                        baseHandler.setUnixEpoch( (String) result.get( "epoch" ) );
+                        baseHandler.setUnixEpoch( (Long) result.get( "epoch" ) );
                         baseHandler.setPlayerName( (String) result.get( "player" ) );
                         baseHandler.setWorldName( (String) result.get( "world" ) );
                         baseHandler.setX( (Double) result.get( "x" ) );
@@ -265,22 +256,24 @@ public class MongoStorageAdapter implements StorageAdapter {
         
     }
 
+    
+    /**
+     * Unused, only needed for foreign-key schemas
+     */
     @Override
     public void addActionName(String actionName) {}
-
     @Override
     public void addWorldName(String worldName) {}
-
     @Override
     public void cachePlayerPrimaryKey(String playerName){}
-
     @Override
     public void addPlayerName(String playerName){}
 
+    /**
+     * 
+     */
     @Override
-    public void close() {
-        // TODO Auto-generated method stub
-    }
+    public void close() {}
     
     
     /**
@@ -368,10 +361,10 @@ public class MongoStorageAdapter implements StorageAdapter {
     @Override
     public boolean testConnection() throws Exception {
         try {
-            if( getMongo() == null ) {
+            if( mongoClient == null ) {
                 throw new Exception( "Pool returned NULL instead of a valid connection." );
             }
-            getMongo().getDB("prism");
+            mongoClient.getDB("prism");
         } catch ( final MongoException e ) {
             throw new Exception( "[InternalAffairs] Error: " + e.getMessage() );
         }

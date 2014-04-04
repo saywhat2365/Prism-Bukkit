@@ -41,7 +41,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
     private HashMap<String, Integer> prismActions = new HashMap<String, Integer>();
     
     
-
 	/**
 	 * 
 	 */

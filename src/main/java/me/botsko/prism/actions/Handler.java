@@ -47,6 +47,12 @@ public interface Handler {
      *            the display_time to set
      */
     public abstract void setUnixEpoch(String epoch);
+    
+    /**
+     * @param display_time
+     *            the display_time to set
+     */
+    public abstract void setUnixEpoch(Long epoch);
 
     /**
      * 
