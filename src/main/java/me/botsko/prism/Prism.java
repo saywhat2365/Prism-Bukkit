@@ -117,7 +117,13 @@ public class Prism extends JavaPlugin {
         plugin_name = this.getDescription().getName();
         plugin_version = this.getDescription().getVersion();
 
+        // Load instances
         prism = this;
+        handlerRegistry = new HandlerRegistry();
+        actionRegistry = new ActionRegistry();
+        eventTimer = new TimeTaken( this );
+        queueStats = new QueueStats();
+        ignore = new Ignore( this );
 
         log( "Initializing Prism " + plugin_version + ". By Viveleroi." );
 
@@ -153,14 +159,6 @@ public class Prism extends JavaPlugin {
 
 
         if( isEnabled() ) {
-
-            // Info needed for setup, init these here
-            handlerRegistry = new HandlerRegistry();
-            actionRegistry = new ActionRegistry();
-
-            eventTimer = new TimeTaken( this );
-            queueStats = new QueueStats();
-            ignore = new Ignore( this );
 
             // Plugins we use
             checkPluginDependancies();
