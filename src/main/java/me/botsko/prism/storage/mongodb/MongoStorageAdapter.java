@@ -80,7 +80,8 @@ public class MongoStorageAdapter implements StorageAdapter {
             // boolean auth = db.authenticate(myUserName, myPassword);
             
             // Create indexes
-            getMongoCollection("prismData").ensureIndex( new BasicDBObject("epoch",-1).append("world",1).append("x",1).append("z",1) .append("y",1).append("action_id",1) );
+            getMongoCollection("prismData").ensureIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("epoch",-1) );
+            getMongoCollection("prismData").ensureIndex( new BasicDBObject("epoch",-1).append("action",1) );
             
         } catch ( UnknownHostException e ) {
             e.printStackTrace();
@@ -286,21 +287,6 @@ public class MongoStorageAdapter implements StorageAdapter {
         
         // @todo add support for include/excludes
         
-        // Time
-        if( !parameters.getIgnoreTime() ){
-            if( parameters.getBeforeTime() != null && parameters.getBeforeTime() > 0 ){
-                query.append( "epoch", new BasicDBObject("$lt", parameters.getBeforeTime()/1000) );
-            }
-            if( parameters.getSinceTime() != null && parameters.getSinceTime() > 0 ){
-                query.append( "epoch", new BasicDBObject("$gte", parameters.getSinceTime()/1000) );
-            }
-        }
-        
-        // World
-        if( parameters.getWorld() != null && !parameters.getWorld().isEmpty() ){
-            query.append( "world", parameters.getWorld() );
-        }
-        
         // Specific coords
         final ArrayList<Location> locations = parameters.getSpecificBlockLocations();
         if( locations.size() > 0 ){
@@ -321,6 +307,21 @@ public class MongoStorageAdapter implements StorageAdapter {
             query.append( "x", new BasicDBObject("$gt", minLoc.getBlockX()).append( "$lt", maxLoc.getBlockX() ) );
             query.append( "y", new BasicDBObject("$gt", minLoc.getBlockY()).append( "$lt", maxLoc.getBlockY() ) );
             query.append( "z", new BasicDBObject("$gt", minLoc.getBlockZ()).append( "$lt", maxLoc.getBlockZ() ) );
+        }
+        
+        // Time
+        if( !parameters.getIgnoreTime() ){
+            if( parameters.getBeforeTime() != null && parameters.getBeforeTime() > 0 ){
+                query.append( "epoch", new BasicDBObject("$lt", parameters.getBeforeTime()/1000) );
+            }
+            if( parameters.getSinceTime() != null && parameters.getSinceTime() > 0 ){
+                query.append( "epoch", new BasicDBObject("$gte", parameters.getSinceTime()/1000) );
+            }
+        }
+        
+        // World
+        if( parameters.getWorld() != null && !parameters.getWorld().isEmpty() ){
+            query.append( "world", parameters.getWorld() );
         }
         
         // Action types
