@@ -99,7 +99,7 @@ public class NearCommand implements SubHandler {
                         }
 
                         // Flush timed data
-                        plugin.eventTimer.printTimeRecord();
+                        Prism.eventTimer.printTimeRecord();
 
                     } else {
                         call.getPlayer()

@@ -486,12 +486,12 @@ public class Preview implements Previewable {
             plugin.getServer().getPluginManager().callEvent( event );
         }
 
-        plugin.eventTimer.recordTimedEvent( "applier function complete" );
+        Prism.eventTimer.recordTimedEvent( "applier function complete" );
 
         // record timed events to log
         if( plugin.getConfig().getBoolean( "prism.debug" ) ) {
             // Flush timed data
-            plugin.eventTimer.printTimeRecord();
+            Prism.eventTimer.printTimeRecord();
             Prism.debug( "Changes: " + changes_applied_count );
             Prism.debug( "Planned: " + changes_planned_count );
             Prism.debug( "Skipped: " + skipped_block_count );

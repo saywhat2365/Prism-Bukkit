@@ -341,7 +341,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
             ResultSet rs = null;
             try {
 
-                plugin.eventTimer.recordTimedEvent( "query started" );
+                Prism.eventTimer.recordTimedEvent( "query started" );
 
                 conn = dbc();
 
@@ -361,7 +361,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                 s = conn.prepareStatement( query );
                 rs = s.executeQuery();
 
-                plugin.eventTimer.recordTimedEvent( "query returned, building results" );
+                Prism.eventTimer.recordTimedEvent( "query returned, building results" );
 
                 while ( rs.next() ) {
 
@@ -471,10 +471,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
         int actionsRecorded = 0;
         try {
 
-            int perBatch = plugin.getConfig().getInt( "prism.database.actions-per-insert-batch" );
-            if( perBatch < 1 )
-                perBatch = 1000;
-
             if( !actions.isEmpty() ) {
 
                 final ArrayList<Handler> extraDataQueue = new ArrayList<Handler>();
@@ -551,13 +547,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
 
                     extraDataQueue.add( a );
 
-                    // Break out of the loop and just commit what we have
-                    if( i >= perBatch ) {
-                        Prism.debug( "Recorder: Batch max exceeded, running insert. Queue remaining: "
-                                + RecordingQueue.getQueue().size() );
-                        break;
-                    }
-                    i++;
                 }
 
                 s.executeBatch();

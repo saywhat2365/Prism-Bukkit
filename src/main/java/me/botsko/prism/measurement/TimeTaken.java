@@ -65,7 +65,7 @@ public class TimeTaken {
 
         // record timed events to log
         if( plugin.getConfig().getBoolean( "prism.debug" ) ) {
-            final TreeMap<Long, String> timers = plugin.eventTimer.getEventsTimedList();
+            final TreeMap<Long, String> timers = Prism.eventTimer.getEventsTimedList();
             if( timers.size() > 0 ) {
                 long lastTime = 0;
                 long total = 0;
@@ -82,6 +82,6 @@ public class TimeTaken {
                 Prism.debug( "Total time: " + total + "ms" );
             }
         }
-        plugin.eventTimer.resetEventList();
+        Prism.eventTimer.resetEventList();
     }
 }

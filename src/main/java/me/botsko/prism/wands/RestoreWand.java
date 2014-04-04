@@ -54,7 +54,7 @@ public class RestoreWand extends QueryWandBase implements Wand {
 
         final Block block = loc.getBlock();
 
-        plugin.eventTimer.recordTimedEvent( "rollback wand used" );
+        Prism.eventTimer.recordTimedEvent( "rollback wand used" );
 
         // Build params
         QueryParameters params;

@@ -86,7 +86,7 @@ public class ActionsQuery {
             }
         }
 
-        plugin.eventTimer.recordTimedEvent( "results object completed" );
+        Prism.eventTimer.recordTimedEvent( "results object completed" );
 
         // Return it
         return res;
