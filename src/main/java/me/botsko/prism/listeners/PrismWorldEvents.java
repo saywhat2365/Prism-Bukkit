@@ -3,7 +3,6 @@ package me.botsko.prism.listeners;
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.ActionFactory;
 import me.botsko.prism.actionlibs.RecordingQueue;
-import me.botsko.prism.utils.BlockUtils;
 
 import org.bukkit.TreeType;
 import org.bukkit.block.BlockState;
@@ -44,11 +43,6 @@ public class PrismWorldEvents implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldLoad(final WorldLoadEvent event) {
-
-        final String worldName = event.getWorld().getName();
-
-        if( !Prism.prismWorlds.containsKey( worldName ) ) {
-            Prism.addWorldName( worldName );
-        }
+        Prism.getStorageAdapter().addWorldName( event.getWorld().getName() );
     }
 }

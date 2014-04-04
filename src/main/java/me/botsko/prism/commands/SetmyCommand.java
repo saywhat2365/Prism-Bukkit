@@ -4,9 +4,9 @@ import me.botsko.elixr.TypeUtils;
 import me.botsko.prism.Prism;
 import me.botsko.prism.commandlibs.CallInfo;
 import me.botsko.prism.commandlibs.SubHandler;
-import me.botsko.prism.settings.Settings;
 import me.botsko.prism.utils.ItemUtils;
 import me.botsko.prism.wands.Wand;
+
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
@@ -90,9 +90,9 @@ public class SetmyCommand implements SubHandler {
             }
             if( setWandMode != null
                     && ( setWandMode.equals( "hand" ) || setWandMode.equals( "item" ) || setWandMode.equals( "block" ) ) ) {
-                Settings.saveSetting( "wand.mode", setWandMode, call.getPlayer() );
+            	Prism.getSettingsStorageAdapter().saveSetting( "wand.mode", setWandMode, call.getPlayer() );
                 // Delete the item so we don't confuse people.
-                Settings.deleteSetting( "wand.item", call.getPlayer() );
+            	Prism.getSettingsStorageAdapter().deleteSetting( "wand.item", call.getPlayer() );
                 call.getPlayer().sendMessage(
                         Prism.messenger.playerHeaderMsg( "Changed your personal wand to " + ChatColor.GREEN
                                 + setWandMode + ChatColor.WHITE + " mode." ) );
@@ -148,7 +148,7 @@ public class SetmyCommand implements SubHandler {
                         return;
                     }
 
-                    Settings.saveSetting( "wand.item", setWandItem, call.getPlayer() );
+                    Prism.getSettingsStorageAdapter().saveSetting( "wand.item", setWandItem, call.getPlayer() );
                     call.getPlayer().sendMessage(
                             Prism.messenger.playerHeaderMsg( "Changed your personal wand item to " + ChatColor.GREEN
                                     + item_name + ChatColor.WHITE + "." ) );

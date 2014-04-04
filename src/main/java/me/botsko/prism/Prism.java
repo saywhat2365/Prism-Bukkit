@@ -17,6 +17,7 @@ import me.botsko.prism.monitors.OreMonitor;
 import me.botsko.prism.monitors.UseMonitor;
 import me.botsko.prism.parameters.*;
 import me.botsko.prism.purge.PurgeManager;
+import me.botsko.prism.storage.SettingsStorageAdapter;
 import me.botsko.prism.storage.StorageAdapter;
 import me.botsko.prism.storage.mysql.MysqlStorageAdapter;
 import me.botsko.prism.wands.Wand;
@@ -65,6 +66,7 @@ public class Prism extends JavaPlugin {
     // private ScheduledFuture<?> scheduledPurgeExecutor;
     private PurgeManager purgeManager;
     private static StorageAdapter storageAdapter = null;
+    private static SettingsStorageAdapter settingsStorageAdapter = null;
 
     /**
      * Public
@@ -151,10 +153,6 @@ public class Prism extends JavaPlugin {
             // Info needed for setup, init these here
             handlerRegistry = new HandlerRegistry();
             actionRegistry = new ActionRegistry();
-
-            // Apply any updates
-            final Updater up = new Updater( this );
-            up.apply_updates();
 
             eventTimer = new TimeTaken( this );
             queueStats = new QueueStats();
@@ -295,6 +293,13 @@ public class Prism extends JavaPlugin {
      */
     public static StorageAdapter getStorageAdapter(){
     	return storageAdapter;
+    }
+    
+    /**
+     * 
+     */
+    public static SettingsStorageAdapter getSettingsStorageAdapter(){
+    	return settingsStorageAdapter;
     }
 
     /**

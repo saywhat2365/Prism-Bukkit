@@ -4,9 +4,9 @@ import me.botsko.elixr.InventoryUtils;
 import me.botsko.prism.Prism;
 import me.botsko.prism.commandlibs.CallInfo;
 import me.botsko.prism.commandlibs.SubHandler;
-import me.botsko.prism.settings.Settings;
 import me.botsko.prism.utils.ItemUtils;
 import me.botsko.prism.wands.*;
+
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -60,7 +60,7 @@ public class WandCommand implements SubHandler {
 
         // Check if the player has a personal override
         if( plugin.getConfig().getBoolean( "prism.wands.allow-user-override" ) ) {
-            final String personalMode = Settings.getSetting( "wand.mode", call.getPlayer() );
+            final String personalMode = Prism.getSettingsStorageAdapter().getSetting( "wand.mode", call.getPlayer() );
             if( personalMode != null ) {
                 mode = personalMode;
             }
@@ -78,7 +78,7 @@ public class WandCommand implements SubHandler {
 
         // Check if the player has a personal override
         if( plugin.getConfig().getBoolean( "prism.wands.allow-user-override" ) ) {
-            final String personalToolKey = Settings.getSetting( "wand.item", call.getPlayer() );
+            final String personalToolKey = Prism.getSettingsStorageAdapter().getSetting( "wand.item", call.getPlayer() );
             if( personalToolKey != null ) {
                 toolKey = personalToolKey;
             }

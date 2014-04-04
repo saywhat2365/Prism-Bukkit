@@ -3,8 +3,8 @@ package me.botsko.prism.commands;
 import me.botsko.prism.Prism;
 import me.botsko.prism.commandlibs.CallInfo;
 import me.botsko.prism.commandlibs.SubHandler;
-import me.botsko.prism.settings.Settings;
 import me.botsko.prism.wands.Wand;
+
 import org.bukkit.ChatColor;
 
 import java.util.List;
@@ -71,8 +71,8 @@ public class ResetmyCommand implements SubHandler {
                             + "." ) );
         }
 
-        Settings.deleteSetting( "wand.item", call.getPlayer() );
-        Settings.deleteSetting( "wand.mode", call.getPlayer() );
+        Prism.getSettingsStorageAdapter().deleteSetting( "wand.item", call.getPlayer() );
+        Prism.getSettingsStorageAdapter().deleteSetting( "wand.mode", call.getPlayer() );
         call.getPlayer().sendMessage(
                 Prism.messenger.playerHeaderMsg( "Your personal wand settings have been reset to server defaults." ) );
     }

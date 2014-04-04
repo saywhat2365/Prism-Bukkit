@@ -19,6 +19,12 @@ public interface StorageAdapter {
 	
 	public StorageWriteResponse create( List<Handler> actions );
 	
+	// Methods needed for foreign-key schemas, some dbs don't use these
+	public void addActionName(String actionName);
+	public void addWorldName(String worldName);
+	public void cachePlayerPrimaryKey(final String playerName);
+	public void addPlayerName(String playerName);
+	
 	public void close();
 	
 }

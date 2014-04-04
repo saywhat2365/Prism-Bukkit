@@ -54,7 +54,7 @@ public class ActionRegistry {
                 "Invalid action type. Custom actions must contain two hyphens." ); }
 
         // Register custom action type with the db
-        Prism.addActionName( actionType.getName() );
+        Prism.getStorageAdapter().addActionName( actionType.getName() );
 
         registeredActions.put( actionType.getName(), actionType );
 

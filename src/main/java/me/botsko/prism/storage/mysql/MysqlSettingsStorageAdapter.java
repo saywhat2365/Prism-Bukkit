@@ -1,4 +1,4 @@
-package me.botsko.prism.settings;
+package me.botsko.prism.storage.mysql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,9 +7,9 @@ import java.sql.SQLException;
 
 import org.bukkit.entity.Player;
 
-import me.botsko.prism.Prism;
+import me.botsko.prism.storage.SettingsStorageAdapter;
 
-public class Settings {
+public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements SettingsStorageAdapter {
 
     /**
      * 
@@ -17,7 +17,7 @@ public class Settings {
      * @param key
      * @return
      */
-    public static String getPlayerKey(Player player, String key) {
+    public String getPlayerKey(Player player, String key) {
         return player.getName() + "." + key;
     }
 
@@ -25,7 +25,7 @@ public class Settings {
      * 
      * @param key
      */
-    public static void deleteSetting(String key) {
+    public void deleteSetting(String key) {
         deleteSetting( key, null );
     }
 
@@ -33,7 +33,7 @@ public class Settings {
      * 
      * @param key
      */
-    public static void deleteSetting(String key, Player player) {
+    public void deleteSetting(String key, Player player){
         Connection conn = null;
         PreparedStatement s = null;
         try {
@@ -43,7 +43,7 @@ public class Settings {
                 finalKey = getPlayerKey( player, key );
             }
 
-            conn = Prism.dbc();
+            conn = dbc();
             s = conn.prepareStatement( "DELETE FROM prism_meta WHERE k = ?" );
             s.setString( 1, finalKey );
             s.executeUpdate();
@@ -68,7 +68,7 @@ public class Settings {
      * @param value
      * @return
      */
-    public static void saveSetting(String key, String value) {
+    public void saveSetting(String key, String value) {
         saveSetting( key, value, null );
     }
 
@@ -78,7 +78,7 @@ public class Settings {
      * @param value
      * @return
      */
-    public static void saveSetting(String key, String value, Player player) {
+    public void saveSetting(String key, String value, Player player) {
         Connection conn = null;
         PreparedStatement s = null;
         try {
@@ -88,7 +88,7 @@ public class Settings {
                 finalKey = getPlayerKey( player, key );
             }
 
-            conn = Prism.dbc();
+            conn = dbc();
             s = conn.prepareStatement( "DELETE FROM prism_meta WHERE k = ?" );
             s.setString( 1, finalKey );
             s.executeUpdate();
@@ -117,7 +117,7 @@ public class Settings {
      * @param key
      * @return
      */
-    public static String getSetting(String key) {
+    public String getSetting(String key) {
         return getSetting( key, null );
     }
 
@@ -126,7 +126,7 @@ public class Settings {
      * @param key
      * @return
      */
-    public static String getSetting(String key, Player player) {
+    public String getSetting(String key, Player player) {
         String value = null;
         Connection conn = null;
         PreparedStatement s = null;
@@ -138,7 +138,7 @@ public class Settings {
                 finalKey = getPlayerKey( player, key );
             }
 
-            conn = Prism.dbc();
+            conn = dbc();
             s = conn.prepareStatement( "SELECT v FROM prism_meta WHERE k = ? LIMIT 0,1" );
             s.setString( 1, finalKey );
             rs = s.executeQuery();
