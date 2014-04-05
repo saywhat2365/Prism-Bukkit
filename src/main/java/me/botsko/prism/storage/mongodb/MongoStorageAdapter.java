@@ -15,6 +15,7 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
@@ -92,23 +93,6 @@ public class MongoStorageAdapter implements StorageAdapter {
         
         return true;
 
-    }
-
-    /**
-     * 
-     */
-    @Override
-    public int delete(QueryParameters parameters) {
-        int total_rows_affected = 0, cycle_rows_affected;
-        try {
-            final BasicDBObject query = queryParamsToMongo( parameters );
-            WriteResult result = getMongoCollection("prismData").remove( query );
-            cycle_rows_affected = result.getN();
-            total_rows_affected += cycle_rows_affected;
-        } catch( MongoException e ){
-            e.printStackTrace();
-        }
-        return total_rows_affected;
     }
     
     /**
@@ -361,6 +345,58 @@ public class MongoStorageAdapter implements StorageAdapter {
      * 
      */
     @Override
+    public long getMinimumChunkingKey() {
+        long minKey = 0;
+        DBCursor cursor = getMongoCollection("prismData").find().sort( new BasicDBObject("epoch",1) ).limit( 1 );
+        try {
+            while(cursor.hasNext()) {
+                minKey = (Long) cursor.next().get("epoch");
+            }
+        } finally {
+            cursor.close();
+        }
+        return minKey;
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    public long getMaximumChunkingKey() {
+        // @todo if before set, use it
+        long maxKey = 0;
+        DBCursor cursor = getMongoCollection("prismData").find().sort( new BasicDBObject("epoch",-1) ).limit( 1 );
+        try {
+            while(cursor.hasNext()) {
+               maxKey = (Long) cursor.next().get("epoch");
+            }
+        } finally {
+            cursor.close();
+        }
+        return maxKey;
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    public int delete(QueryParameters parameters) {
+        int total_rows_affected = 0, cycle_rows_affected;
+        try {
+            final BasicDBObject query = queryParamsToMongo( parameters );
+            WriteResult result = getMongoCollection("prismData").remove( query );
+            cycle_rows_affected = result.getN();
+            total_rows_affected += cycle_rows_affected;
+        } catch( MongoException e ){
+            e.printStackTrace();
+        }
+        return total_rows_affected;
+    }
+    
+    /**
+     * 
+     */
+    @Override
     public boolean testConnection() throws Exception {
         try {
             if( mongoClient == null ) {
@@ -371,25 +407,5 @@ public class MongoStorageAdapter implements StorageAdapter {
             throw new Exception( "[InternalAffairs] Error: " + e.getMessage() );
         }
         return true;
-    }
-
-    
-    /**
-     * 
-     */
-    @Override
-    public long getMinimumChunkingKey() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    
-    /**
-     * 
-     */
-    @Override
-    public long getMaximumChunkingKey() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 }
