@@ -24,13 +24,11 @@ public interface SettingsStorageAdapter {
 	 */
 	public void saveSetting(String key, String value);
 	
-	
 	/**
      * Remove a player's meta setting by its key
      * @param key
      */
 	public void deleteSetting(String key, Player player);
-	
 	
 	/**
      * Retrieve a player's meta setting by its key
@@ -38,7 +36,6 @@ public interface SettingsStorageAdapter {
      * @return
      */
 	public void saveSetting(String key, String value, Player player);
-	
 	
 	/**
      * Save a new key/value for a player

@@ -40,9 +40,9 @@ public class MongoStorageAdapter implements StorageAdapter {
      * @param collectionName
      * @return
      */
-    protected DBCollection getMongoCollection( String collectionName ){
+    protected DBCollection getCollection( String collectionName ){
         try {
-            DB db = getMongoDB();
+            DB db = getDB();
             return db.getCollection(collectionName);
         } catch( MongoException e ){
             e.printStackTrace();
@@ -56,7 +56,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      * @param collectionName
      * @return
      */
-    protected DB getMongoDB(){
+    protected DB getDB(){
         DB db = null;
         try {
             db = mongoClient.getDB(database);
@@ -81,8 +81,8 @@ public class MongoStorageAdapter implements StorageAdapter {
             // boolean auth = db.authenticate(myUserName, myPassword);
             
             // Create indexes
-            getMongoCollection("prismData").ensureIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("epoch",-1) );
-            getMongoCollection("prismData").ensureIndex( new BasicDBObject("epoch",-1).append("action",1) );
+            getCollection("prismData").ensureIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("epoch",-1) );
+            getCollection("prismData").ensureIndex( new BasicDBObject("epoch",-1).append("action",1) );
             
         } catch ( UnknownHostException e ) {
             e.printStackTrace();
@@ -132,7 +132,7 @@ public class MongoStorageAdapter implements StorageAdapter {
 //                BasicDBObject group = new BasicDBObject("_id","$action").append( "count", "$sum : 1" );
 //                Prism.debug(group.toString());
                 
-                AggregationOutput aggregated = getMongoCollection("prismData").aggregate( matcher, sorter, limit );
+                AggregationOutput aggregated = getCollection("prismData").aggregate( matcher, sorter, limit );
                 Prism.debug(aggregated.getCommand().toString());
                 
                 
@@ -225,7 +225,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     
                 }
 
-                DBCollection coll = getMongoCollection("prismData");
+                DBCollection coll = getCollection("prismData");
                 WriteResult res = coll.insert( documents );
                 Prism.debug("Recorder logged " + res.getN() + " new actions.");
 
@@ -347,7 +347,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     @Override
     public long getMinimumChunkingKey() {
         long minKey = 0;
-        DBCursor cursor = getMongoCollection("prismData").find().sort( new BasicDBObject("epoch",1) ).limit( 1 );
+        DBCursor cursor = getCollection("prismData").find().sort( new BasicDBObject("epoch",1) ).limit( 1 );
         try {
             while(cursor.hasNext()) {
                 minKey = (Long) cursor.next().get("epoch");
@@ -365,7 +365,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     public long getMaximumChunkingKey() {
         // @todo if before set, use it
         long maxKey = 0;
-        DBCursor cursor = getMongoCollection("prismData").find().sort( new BasicDBObject("epoch",-1) ).limit( 1 );
+        DBCursor cursor = getCollection("prismData").find().sort( new BasicDBObject("epoch",-1) ).limit( 1 );
         try {
             while(cursor.hasNext()) {
                maxKey = (Long) cursor.next().get("epoch");
@@ -384,7 +384,7 @@ public class MongoStorageAdapter implements StorageAdapter {
         int total_rows_affected = 0, cycle_rows_affected;
         try {
             final BasicDBObject query = queryParamsToMongo( parameters );
-            WriteResult result = getMongoCollection("prismData").remove( query );
+            WriteResult result = getCollection("prismData").remove( query );
             cycle_rows_affected = result.getN();
             total_rows_affected += cycle_rows_affected;
         } catch( MongoException e ){

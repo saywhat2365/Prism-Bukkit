@@ -35,7 +35,7 @@ public class MongoSettingsStorageAdapter extends MongoStorageAdapter implements 
      * @param key
      */
     public void deleteSetting(String key, Player player){
-        getMongoCollection("meta").remove( new BasicDBObject("k",getNamespacedKey( key, player )) );
+        getCollection("meta").remove( new BasicDBObject("k",getNamespacedKey( key, player )) );
     }
 
     /**
@@ -56,7 +56,7 @@ public class MongoSettingsStorageAdapter extends MongoStorageAdapter implements 
      */
     public void saveSetting(String key, String value, Player player) {
         deleteSetting(key,player);
-        getMongoCollection("meta").insert( new BasicDBObject("k",getNamespacedKey( key, player )).append("v",value));
+        getCollection("meta").insert( new BasicDBObject("k",getNamespacedKey( key, player )).append("v",value));
     }
 
     /**
@@ -75,7 +75,7 @@ public class MongoSettingsStorageAdapter extends MongoStorageAdapter implements 
      */
     public String getSetting(String key, Player player) {
         String v = null;
-        DBCursor cursor = getMongoCollection("meta").find( new BasicDBObject("k",getNamespacedKey( key, player )) ).limit( 1 );
+        DBCursor cursor = getCollection("meta").find( new BasicDBObject("k",getNamespacedKey( key, player )) ).limit( 1 );
         try {
             while(cursor.hasNext()) {
                v = (String) cursor.next().get("v");
