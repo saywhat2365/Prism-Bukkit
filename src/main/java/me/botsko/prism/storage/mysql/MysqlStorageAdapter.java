@@ -31,7 +31,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
 	/**
      * Connection Pool
      */
-    private DataSource pool = new DataSource();
+    private static DataSource pool = new DataSource();
     private SelectQueryBuilder qb;
     /**
      * DB Foreign key caches
@@ -216,7 +216,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
      * @return
      * @throws SQLException
      */
-    protected Connection dbc() {
+    protected static Connection dbc() {
         Connection con = null;
         try {
             con = pool.getConnection();

@@ -7,7 +7,7 @@ import com.mongodb.DBCursor;
 
 import me.botsko.prism.storage.SettingsStorageAdapter;
 
-public class MongoSettingsStorageAdapter extends MongoStorageAdapter implements SettingsStorageAdapter {
+public class MongoSettingsStorageAdapter implements SettingsStorageAdapter {
 
     /**
      * Namespaces a key by the player, if provided
@@ -35,7 +35,7 @@ public class MongoSettingsStorageAdapter extends MongoStorageAdapter implements 
      * @param key
      */
     public void deleteSetting(String key, Player player){
-        getCollection("meta").remove( new BasicDBObject("k",getNamespacedKey( key, player )) );
+        MongoStorageAdapter.getCollection("meta").remove( new BasicDBObject("k",getNamespacedKey( key, player )) );
     }
 
     /**
@@ -56,7 +56,7 @@ public class MongoSettingsStorageAdapter extends MongoStorageAdapter implements 
      */
     public void saveSetting(String key, String value, Player player) {
         deleteSetting(key,player);
-        getCollection("meta").insert( new BasicDBObject("k",getNamespacedKey( key, player )).append("v",value));
+        MongoStorageAdapter.getCollection("meta").insert( new BasicDBObject("k",getNamespacedKey( key, player )).append("v",value));
     }
 
     /**
@@ -75,7 +75,7 @@ public class MongoSettingsStorageAdapter extends MongoStorageAdapter implements 
      */
     public String getSetting(String key, Player player) {
         String v = null;
-        DBCursor cursor = getCollection("meta").find( new BasicDBObject("k",getNamespacedKey( key, player )) ).limit( 1 );
+        DBCursor cursor = MongoStorageAdapter.getCollection("meta").find( new BasicDBObject("k",getNamespacedKey( key, player )) ).limit( 1 );
         try {
             while(cursor.hasNext()) {
                v = (String) cursor.next().get("v");

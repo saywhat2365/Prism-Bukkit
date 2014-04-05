@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import me.botsko.prism.storage.SettingsStorageAdapter;
 
-public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements SettingsStorageAdapter {
+public class MysqlSettingsStorageAdapter implements SettingsStorageAdapter {
 
     /**
      * Namespaces a key by the player, if provided
@@ -41,7 +41,7 @@ public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements 
         PreparedStatement s = null;
         try {
 
-            conn = dbc();
+            conn = MysqlStorageAdapter.dbc();
             s = conn.prepareStatement( "DELETE FROM prism_meta WHERE k = ?" );
             s.setString( 1, getNamespacedKey( key, player ) );
             s.executeUpdate();
@@ -83,7 +83,7 @@ public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements 
             
             String finalKey = getNamespacedKey( key, player );
 
-            conn = dbc();
+            conn = MysqlStorageAdapter.dbc();
             s = conn.prepareStatement( "DELETE FROM prism_meta WHERE k = ?" );
             s.setString( 1, finalKey );
             s.executeUpdate();
@@ -128,7 +128,7 @@ public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements 
         ResultSet rs = null;
         try {
 
-            conn = dbc();
+            conn = MysqlStorageAdapter.dbc();
             s = conn.prepareStatement( "SELECT v FROM prism_meta WHERE k = ? LIMIT 0,1" );
             s.setString( 1, getNamespacedKey( key, player ) );
             rs = s.executeQuery();

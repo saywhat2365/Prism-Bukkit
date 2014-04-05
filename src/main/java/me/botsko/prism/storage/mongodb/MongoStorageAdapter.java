@@ -30,8 +30,8 @@ import me.botsko.prism.storage.StorageWriteResponse;
 
 public class MongoStorageAdapter implements StorageAdapter {
     
-    private MongoClient mongoClient = null;
-    private String database;
+    private static MongoClient mongoClient = null;
+    private static String database;
   
 
     /**
@@ -40,7 +40,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      * @param collectionName
      * @return
      */
-    protected DBCollection getCollection( String collectionName ){
+    protected static DBCollection getCollection( String collectionName ){
         try {
             DB db = getDB();
             return db.getCollection(collectionName);
@@ -56,7 +56,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      * @param collectionName
      * @return
      */
-    protected DB getDB(){
+    protected static DB getDB(){
         DB db = null;
         try {
             db = mongoClient.getDB(database);
