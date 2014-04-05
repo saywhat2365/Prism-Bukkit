@@ -12,13 +12,16 @@ import me.botsko.prism.storage.SettingsStorageAdapter;
 public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements SettingsStorageAdapter {
 
     /**
-     * 
-     * @param player
+     * Namespaces a key by the player, if provided
      * @param key
+     * @param player
      * @return
      */
-    public String getPlayerKey(Player player, String key) {
-        return player.getName() + "." + key;
+    private String getNamespacedKey(String key,Player player) {
+        if( player != null ) {
+            key = player.getName() + "." + key;
+        }
+        return key;
     }
 
     /**
@@ -38,14 +41,9 @@ public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements 
         PreparedStatement s = null;
         try {
 
-            String finalKey = key;
-            if( player != null ) {
-                finalKey = getPlayerKey( player, key );
-            }
-
             conn = dbc();
             s = conn.prepareStatement( "DELETE FROM prism_meta WHERE k = ?" );
-            s.setString( 1, finalKey );
+            s.setString( 1, getNamespacedKey( key, player ) );
             s.executeUpdate();
 
         } catch ( final SQLException e ) {
@@ -82,11 +80,8 @@ public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements 
         Connection conn = null;
         PreparedStatement s = null;
         try {
-
-            String finalKey = key;
-            if( player != null ) {
-                finalKey = getPlayerKey( player, key );
-            }
+            
+            String finalKey = getNamespacedKey( key, player );
 
             conn = dbc();
             s = conn.prepareStatement( "DELETE FROM prism_meta WHERE k = ?" );
@@ -133,14 +128,9 @@ public class MysqlSettingsStorageAdapter extends MysqlStorageAdapter implements 
         ResultSet rs = null;
         try {
 
-            String finalKey = key;
-            if( player != null ) {
-                finalKey = getPlayerKey( player, key );
-            }
-
             conn = dbc();
             s = conn.prepareStatement( "SELECT v FROM prism_meta WHERE k = ? LIMIT 0,1" );
-            s.setString( 1, finalKey );
+            s.setString( 1, getNamespacedKey( key, player ) );
             rs = s.executeQuery();
 
             while ( rs.next() ) {

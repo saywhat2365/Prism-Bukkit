@@ -40,7 +40,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      * @param collectionName
      * @return
      */
-    private DBCollection getMongoCollection( String collectionName ){
+    protected DBCollection getMongoCollection( String collectionName ){
         try {
             DB db = getMongoDB();
             return db.getCollection(collectionName);
@@ -56,7 +56,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      * @param collectionName
      * @return
      */
-    private DB getMongoDB(){
+    protected DB getMongoDB(){
         DB db = null;
         try {
             db = mongoClient.getDB(database);
