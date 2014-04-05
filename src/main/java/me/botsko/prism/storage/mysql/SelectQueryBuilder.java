@@ -89,9 +89,9 @@ public class SelectQueryBuilder extends QueryBuilder {
         final int id = parameters.getId();
         if( id > 0 ) { return "WHERE " + tableNameData + ".id = " + id; }
 
-        // id range conditions
-        final int minId = parameters.getMinPrimaryKey();
-        final int maxId = parameters.getMaxPrimaryKey();
+        // Primary key range conditions (currently used only for purges)
+        final long minId = parameters.getMinChunkingKey();
+        final long maxId = parameters.getMaxChunkingKey();
         if( minId > 0 && maxId > 0 && minId != maxId ) {
             addCondition( tableNameData + ".id >= " + minId );
             addCondition( tableNameData + ".id < " + maxId );

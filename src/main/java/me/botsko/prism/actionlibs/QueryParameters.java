@@ -33,8 +33,8 @@ public class QueryParameters implements Cloneable {
      */
     protected boolean allow_no_radius = false;
     protected int id = 0;
-    protected int minId = 0;
-    protected int maxId = 0;
+//    protected int minId = 0;
+//    protected int maxId = 0;
     protected Vector maxLoc;
     protected Vector minLoc;
     protected int parent_id = 0;
@@ -46,6 +46,8 @@ public class QueryParameters implements Cloneable {
     protected String world;
     protected String keyword;
     protected boolean ignoreTime;
+    protected long minChunkingId = 0;
+    protected long maxChunkingId = 0;
 
     /**
      * Params that allow multiple values
@@ -78,37 +80,37 @@ public class QueryParameters implements Cloneable {
         this.id = id;
     }
 
-    /**
-     * 
-     * @param minId
-     */
-    public void setMinPrimaryKey(int minId) {
-        this.minId = minId;
-    }
-
-    /**
-     * 
-     * @param minId
-     */
-    public int getMinPrimaryKey() {
-        return this.minId;
-    }
-
-    /**
-     * 
-     * @param maxId
-     */
-    public void setMaxPrimaryKey(int maxId) {
-        this.maxId = maxId;
-    }
-
-    /**
-     * 
-     * @param minId
-     */
-    public int getMaxPrimaryKey() {
-        return this.maxId;
-    }
+//    /**
+//     * 
+//     * @param minId
+//     */
+//    public void setMinPrimaryKey(int minId) {
+//        this.minId = minId;
+//    }
+//
+//    /**
+//     * 
+//     * @param minId
+//     */
+//    public int getMinPrimaryKey() {
+//        return this.minId;
+//    }
+//
+//    /**
+//     * 
+//     * @param maxId
+//     */
+//    public void setMaxPrimaryKey(int maxId) {
+//        this.maxId = maxId;
+//    }
+//
+//    /**
+//     * 
+//     * @param minId
+//     */
+//    public int getMaxPrimaryKey() {
+//        return this.maxId;
+//    }
 
     /**
      * @return the entity
@@ -548,16 +550,7 @@ public class QueryParameters implements Cloneable {
     public void addSharedPlayer(CommandSender sender) {
         this.shared_players.add( sender );
     }
-
-    /**
-	 * 
-	 */
-    @Override
-    public QueryParameters clone() throws CloneNotSupportedException {
-        final QueryParameters cloned = (QueryParameters) super.clone();
-        cloned.actionTypeRules = new HashMap<String, MatchRule>( actionTypeRules );
-        return cloned;
-    }
+    
 
     /**
      * Ignore the time.
@@ -575,5 +568,48 @@ public class QueryParameters implements Cloneable {
      */
     public boolean getIgnoreTime() {
         return ignoreTime;
+    }
+    
+    
+    /**
+     * 
+     * @param minId
+     */
+    public void setMinChunkingKey(long minId) {
+        this.minChunkingId = minId;
+    }
+
+    /**
+     * 
+     * @param minId
+     */
+    public long getMinChunkingKey() {
+        return this.minChunkingId;
+    }
+
+    /**
+     * 
+     * @param maxId
+     */
+    public void setMaxChunkingKey(long maxId) {
+        this.maxChunkingId = maxId;
+    }
+
+    /**
+     * 
+     * @param minId
+     */
+    public long getMaxChunkingKey() {
+        return this.maxChunkingId;
+    }
+
+    /**
+	 * 
+	 */
+    @Override
+    public QueryParameters clone() throws CloneNotSupportedException {
+        final QueryParameters cloned = (QueryParameters) super.clone();
+        cloned.actionTypeRules = new HashMap<String, MatchRule>( actionTypeRules );
+        return cloned;
     }
 }

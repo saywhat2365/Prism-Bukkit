@@ -287,6 +287,8 @@ public class MongoStorageAdapter implements StorageAdapter {
         
         // @todo add support for include/excludes
         
+        // @todo properly chunk by epoch
+        
         // Specific coords
         final ArrayList<Location> locations = parameters.getSpecificBlockLocations();
         if( locations.size() > 0 ){
@@ -369,5 +371,25 @@ public class MongoStorageAdapter implements StorageAdapter {
             throw new Exception( "[InternalAffairs] Error: " + e.getMessage() );
         }
         return true;
+    }
+
+    
+    /**
+     * 
+     */
+    @Override
+    public long getMinimumChunkingKey() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    
+    /**
+     * 
+     */
+    @Override
+    public long getMaximumChunkingKey() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }

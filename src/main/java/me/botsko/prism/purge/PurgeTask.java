@@ -31,12 +31,12 @@ public class PurgeTask implements Runnable {
     /**
 	 * 
 	 */
-    private int minId = 0;
+    private long minId = 0;
 
     /**
 	 * 
 	 */
-    private int maxId = 0;
+    private long maxId = 0;
 
     /**
 	 * 
@@ -47,8 +47,8 @@ public class PurgeTask implements Runnable {
      * 
      * @param plugin
      */
-    public PurgeTask(Prism plugin, CopyOnWriteArrayList<QueryParameters> paramList, int purge_tick_delay, int minId,
-            int maxId, PurgeCallback callback) {
+    public PurgeTask(Prism plugin, CopyOnWriteArrayList<QueryParameters> paramList, int purge_tick_delay, long minId,
+            long maxId, PurgeCallback callback) {
         this.plugin = plugin;
         this.paramList = paramList;
         this.purge_tick_delay = purge_tick_delay;
@@ -79,9 +79,9 @@ public class PurgeTask implements Runnable {
         int spread = plugin.getConfig().getInt( "prism.purge.records-per-batch" );
         if( spread <= 1 )
             spread = 10000;
-        int newMinId = minId + spread;
-        param.setMinPrimaryKey( minId );
-        param.setMaxPrimaryKey( newMinId );
+        long newMinId = minId + spread;
+        param.setMinChunkingKey( minId );
+        param.setMaxChunkingKey( newMinId );
 
         cycle_rows_affected = aq.delete( param );
         plugin.total_records_affected += cycle_rows_affected;
@@ -95,8 +95,8 @@ public class PurgeTask implements Runnable {
         }
 
         Prism.debug( "------------------- " + param.getOriginalCommand() );
-        Prism.debug( "minId: " + minId );
-        Prism.debug( "maxId: " + maxId );
+        Prism.debug( "minChunkKey: " + minId );
+        Prism.debug( "maxChunkKey: " + maxId );
         Prism.debug( "newMinId: " + newMinId );
         Prism.debug( "cycle_rows_affected: " + cycle_rows_affected );
         Prism.debug( "cycle_complete: " + cycle_complete );
@@ -130,7 +130,7 @@ public class PurgeTask implements Runnable {
             Prism.log( "Moving on to next purge rule..." );
 
             // Identify the minimum for chunking
-            newMinId = PurgeChunkingUtil.getMinimumPrimaryKey();
+            newMinId = Prism.getStorageAdapter().getMinimumChunkingKey();
             if( newMinId == 0 ) {
                 Prism.log( "No minimum primary key could be found for purge chunking." );
                 return;

@@ -7,7 +7,6 @@ import me.botsko.prism.appliers.PrismProcessType;
 import me.botsko.prism.commandlibs.CallInfo;
 import me.botsko.prism.commandlibs.PreprocessArgs;
 import me.botsko.prism.commandlibs.SubHandler;
-import me.botsko.prism.purge.PurgeChunkingUtil;
 import me.botsko.prism.purge.PurgeTask;
 import me.botsko.prism.purge.SenderPurgeCallback;
 import org.bukkit.ChatColor;
@@ -93,7 +92,7 @@ public class DeleteCommand implements SubHandler {
         if( parameters.getFoundArgs().size() > 0 ) {
 
             // Identify the minimum for chunking
-            final int minId = PurgeChunkingUtil.getMinimumPrimaryKey();
+            final long minId = Prism.getStorageAdapter().getMinimumChunkingKey();
             if( minId == 0 ) {
                 call.getSender().sendMessage(
                         Prism.messenger.playerError( "No minimum primary key could be found for purge chunking" ) );
@@ -101,7 +100,7 @@ public class DeleteCommand implements SubHandler {
             }
 
             // Identify the max id for chunking
-            final int maxId = PurgeChunkingUtil.getMaximumPrimaryKey();
+            final long maxId = Prism.getStorageAdapter().getMaximumChunkingKey();
             if( maxId == 0 ) {
                 call.getSender().sendMessage(
                         Prism.messenger.playerError( "No maximum primary key could be found for purge chunking" ) );

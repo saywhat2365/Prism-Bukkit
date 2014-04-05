@@ -228,41 +228,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
         }
         return con;
     }
-
-	/**
-	 * 
-	 */
-	@Override
-	public int delete(QueryParameters parameters) {
-		int total_rows_affected = 0, cycle_rows_affected;
-		Connection conn = null;
-        Statement s = null;
-        try {
-            final DeleteQueryBuilder dqb = new DeleteQueryBuilder( prismActions );
-            // Build conditions based off final args
-            final String query = dqb.getQuery( parameters, false );
-            conn = dbc();
-            if( conn != null && !conn.isClosed() ) {
-                s = conn.createStatement();
-                cycle_rows_affected = s.executeUpdate( query );
-                total_rows_affected += cycle_rows_affected;
-            } else {
-                Prism.log( "Prism database error. Purge cannot continue." );
-            }
-        } catch ( final SQLException e ) {
-            e.printStackTrace();
-        } finally {
-            if( s != null )
-                try {
-                    s.close();
-                } catch ( final SQLException ignored ) {}
-            if( conn != null )
-                try {
-                    conn.close();
-                } catch ( final SQLException ignored ) {}
-        }
-        return total_rows_affected;
-	}
 	
 	/**
 	 * 
@@ -911,6 +876,119 @@ public class MysqlStorageAdapter implements StorageAdapter {
         }
     }
     
+    
+    /**
+     * 
+     * @param playername
+     */
+    public long getMinimumChunkingKey() {
+        int id = 0;
+        Connection conn = null;
+        PreparedStatement s = null;
+        ResultSet rs = null;
+        try {
+
+            conn = dbc();
+            s = conn.prepareStatement( "SELECT MIN(id) FROM prism_data" );
+            s.executeQuery();
+            rs = s.getResultSet();
+
+            if( rs.first() ) {
+                id = rs.getInt( 1 );
+            }
+
+        } catch ( final SQLException ignored ) {
+
+        } finally {
+            if( rs != null )
+                try {
+                    rs.close();
+                } catch ( final SQLException ignored ) {}
+            if( s != null )
+                try {
+                    s.close();
+                } catch ( final SQLException ignored ) {}
+            if( conn != null )
+                try {
+                    conn.close();
+                } catch ( final SQLException ignored ) {}
+        }
+        return id;
+    }
+
+    /**
+     * 
+     * @param playername
+     */
+    public long getMaximumChunkingKey() {
+        int id = 0;
+        Connection conn = null;
+        PreparedStatement s = null;
+        ResultSet rs = null;
+        try {
+
+            conn = dbc();
+            s = conn.prepareStatement( "SELECT id FROM prism_data ORDER BY id DESC LIMIT 1;" );
+            s.executeQuery();
+            rs = s.getResultSet();
+
+            if( rs.first() ) {
+                id = rs.getInt( 1 );
+            }
+
+        } catch ( final SQLException ignored ) {
+
+        } finally {
+            if( rs != null )
+                try {
+                    rs.close();
+                } catch ( final SQLException ignored ) {}
+            if( s != null )
+                try {
+                    s.close();
+                } catch ( final SQLException ignored ) {}
+            if( conn != null )
+                try {
+                    conn.close();
+                } catch ( final SQLException ignored ) {}
+        }
+        return id;
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    public int delete(QueryParameters parameters) {
+        int total_rows_affected = 0, cycle_rows_affected;
+        Connection conn = null;
+        Statement s = null;
+        try {
+            final DeleteQueryBuilder dqb = new DeleteQueryBuilder( prismActions );
+            // Build conditions based off final args
+            final String query = dqb.getQuery( parameters, false );
+            conn = dbc();
+            if( conn != null && !conn.isClosed() ) {
+                s = conn.createStatement();
+                cycle_rows_affected = s.executeUpdate( query );
+                total_rows_affected += cycle_rows_affected;
+            } else {
+                Prism.log( "Prism database error. Purge cannot continue." );
+            }
+        } catch ( final SQLException e ) {
+            e.printStackTrace();
+        } finally {
+            if( s != null )
+                try {
+                    s.close();
+                } catch ( final SQLException ignored ) {}
+            if( conn != null )
+                try {
+                    conn.close();
+                } catch ( final SQLException ignored ) {}
+        }
+        return total_rows_affected;
+    }
     
     /**
      * @throws Exception  
