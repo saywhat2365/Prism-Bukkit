@@ -121,29 +121,31 @@ public class MongoStorageAdapter implements StorageAdapter {
                 Prism.eventTimer.recordTimedEvent( "query started" );
                 
                 BasicDBObject matcher = new BasicDBObject("$match",query);
-                
-//                Prism.debug( query.toString() );
-                
+
                 int sortDir = parameters.getSortDirection().equals( "ASC" ) ? 1 : -1;
                 BasicDBObject sorter = new BasicDBObject( "$sort", new BasicDBObject("epoch",sortDir).append( "x", 1 ).append( "z", 1 ).append( "y", 1 ) );
                 BasicDBObject limit = new BasicDBObject( "$limit", parameters.getLimit() );
-//                BasicDBObject group = new BasicDBObject("$group", new BasicDBObject("_id",new BasicDBObject("action","$action").append( "player", "$player" )).append( "count", new BasicDBObject("$sum", 1) ) );
+                BasicDBObject group = new BasicDBObject("$group", new BasicDBObject("_id",new BasicDBObject("action","$action").append( "player", "$player" )).append( "count", new BasicDBObject("$sum", 1) ) );
                 
-//                BasicDBObject group = new BasicDBObject("_id","$action").append( "count", "$sum : 1" );
-//                Prism.debug(group.toString());
-                
-                AggregationOutput aggregated = getCollection("prismData").aggregate( matcher, sorter, limit );
+                AggregationOutput aggregated = getCollection("prismData").aggregate( matcher, group, sorter, limit );
                 Prism.debug(aggregated.getCommand().toString());
-                
                 
                 Prism.eventTimer.recordTimedEvent( "query returned, will now build results" );
                 
                 for (DBObject result : aggregated.results()){
-
-                    if( result.get( "action" ) == null ) continue;
+                    
+                    // If grouping, the aggregation framework gives results under _id
+                    DBObject record = result;
+                    if( shouldGroup ){
+                        record = (DBObject) record.get( "_id" );
+                    }
+                    
+                    System.out.println( result );
+                    
+                    if( record.get( "action" ) == null ) continue;
 
                     // Get the action handler
-                    final ActionType actionType = Prism.getActionRegistry().getAction( result.get( "action" ).toString() );
+                    final ActionType actionType = Prism.getActionRegistry().getAction( record.get( "action" ).toString() );
 
                     if( actionType == null ) continue;
 
@@ -154,17 +156,17 @@ public class MongoStorageAdapter implements StorageAdapter {
                         // Set all shared values
                         baseHandler.setPlugin( Bukkit.getPluginManager().getPlugin( "Prism" ) );
                         baseHandler.setType( actionType );
-                        baseHandler.setUnixEpoch( (Long) result.get( "epoch" ) );
-                        baseHandler.setPlayerName( (String) result.get( "player" ) );
-                        baseHandler.setWorldName( (String) result.get( "world" ) );
-                        baseHandler.setX( (Double) result.get( "x" ) );
-                        baseHandler.setY( (Double) result.get( "y" ) );
-                        baseHandler.setZ( (Double) result.get( "z" ) );
-                        baseHandler.setBlockId( (Integer) result.get( "block_id" ) );
-                        baseHandler.setBlockSubId( (Integer) result.get( "block_subid" ) );
-                        baseHandler.setOldBlockId( (Integer) result.get( "old_block_id" ) );
-                        baseHandler.setOldBlockSubId( (Integer) result.get( "old_block_subid" ) );
-                        baseHandler.setData( (String) result.get( "data" ) );
+                        baseHandler.setUnixEpoch( (Long) record.get( "epoch" ) );
+                        baseHandler.setPlayerName( (String) record.get( "player" ) );
+                        baseHandler.setWorldName( (String) record.get( "world" ) );
+                        baseHandler.setX( (Double) record.get( "x" ) );
+                        baseHandler.setY( (Double) record.get( "y" ) );
+                        baseHandler.setZ( (Double) record.get( "z" ) );
+                        baseHandler.setBlockId( (Integer) record.get( "block_id" ) );
+                        baseHandler.setBlockSubId( (Integer) record.get( "block_subid" ) );
+                        baseHandler.setOldBlockId( (Integer) record.get( "old_block_id" ) );
+                        baseHandler.setOldBlockSubId( (Integer) record.get( "old_block_subid" ) );
+                        baseHandler.setData( (String) record.get( "data" ) );
                         baseHandler.setMaterialAliases( Prism.getItems() );
 
                         // Set aggregate counts if a lookup
