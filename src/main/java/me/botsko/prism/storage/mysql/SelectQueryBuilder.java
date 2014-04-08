@@ -35,29 +35,27 @@ public class SelectQueryBuilder extends QueryBuilder {
         String query = "";
 
         query += "SELECT ";
-
-        columns.add( "id" );
-        columns.add( "epoch" );
+        
+        // Always used fields
         columns.add( "action_id" );
         columns.add( "player" );
         columns.add( "world_id" );
+        columns.add( "block_id" );
+        columns.add( "block_subid" );
+        columns.add( "data" );
+        columns.add( "epoch" );
 
-        if( shouldGroup ) {
-            columns.add( "AVG(x)" );
-            columns.add( "AVG(y)" );
-            columns.add( "AVG(z)" );
-        } else {
+        // Cols used when not grouping
+        if( !shouldGroup ) {
+            columns.add( "id" );
             columns.add( "x" );
             columns.add( "y" );
             columns.add( "z" );
+            columns.add( "old_block_id" );
+            columns.add( "old_block_subid" );
         }
 
-        columns.add( "block_id" );
-        columns.add( "block_subid" );
-        columns.add( "old_block_id" );
-        columns.add( "old_block_subid" );
-        columns.add( "data" );
-
+        // Cols used when grouping
         if( shouldGroup ) {
             columns.add( "COUNT(*) counted" );
         }
@@ -312,7 +310,7 @@ public class SelectQueryBuilder extends QueryBuilder {
     @Override
     protected String group() {
         if( shouldGroup ) { return " GROUP BY " + tableNameData + ".action_id, " + tableNameData + ".player_id, "
-                + tableNameData + ".block_id, ex.data, DATE(FROM_UNIXTIME(" + tableNameData + ".epoch))"; }
+                + tableNameData + ".block_id, " + tableNameData + ".block_subid, ex.data, DATE(FROM_UNIXTIME(" + tableNameData + ".epoch))"; }
         return "";
     }
 

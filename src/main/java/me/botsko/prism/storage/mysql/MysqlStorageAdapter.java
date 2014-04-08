@@ -279,20 +279,19 @@ public class MysqlStorageAdapter implements StorageAdapter {
 
                 while ( rs.next() ) {
 
-                    if( rs.getString( 3 ) == null )
-                        continue;
+                    if( rs.getString( "action_id" ) == null ) continue;
 
                     // Convert action ID to name
                     // Performance-wise this is a lot faster than table joins
                     // and the cache data should always be available
                     String actionName = "";
                     for ( final Entry<String, Integer> entry : prismActions.entrySet() ) {
-                        if( entry.getValue() == rs.getInt( 3 ) ) {
+                        if( entry.getValue() == rs.getInt( "action_id" ) ) {
                             actionName = entry.getKey();
                         }
                     }
                     if( actionName.isEmpty() ) {
-                        Prism.log( "Record contains action ID that doesn't exist in cache: " + rs.getInt( 3 ) );
+                        Prism.log( "Record contains action ID that doesn't exist in cache: " + rs.getInt( "action_id" ) );
                         continue;
                     }
 
@@ -311,34 +310,37 @@ public class MysqlStorageAdapter implements StorageAdapter {
                         // table joins
                         String worldName = "";
                         for ( final Entry<String, Integer> entry : prismWorlds.entrySet() ) {
-                            if( entry.getValue() == rs.getInt( 5 ) ) {
+                            if( entry.getValue() == rs.getInt( "world_id" ) ) {
                                 worldName = entry.getKey();
                             }
                         }
-
-                        // Set all shared values
+                        
+                        // Some dependency injection
                         baseHandler.setPlugin( Bukkit.getPluginManager().getPlugin( "Prism" ) );
-                        baseHandler.setType( actionType );
-                        baseHandler.setId( rs.getInt( 1 ) );
-                        baseHandler.setUnixEpoch( rs.getString( 2 ) );
-                        baseHandler.setPlayerName( rs.getString( 4 ) );
-                        baseHandler.setWorldName( worldName );
-                        baseHandler.setX( rs.getInt( 6 ) );
-                        baseHandler.setY( rs.getInt( 7 ) );
-                        baseHandler.setZ( rs.getInt( 8 ) );
-                        baseHandler.setBlockId( rs.getInt( 9 ) );
-                        baseHandler.setBlockSubId( rs.getInt( 10 ) );
-                        baseHandler.setOldBlockId( rs.getInt( 11 ) );
-                        baseHandler.setOldBlockSubId( rs.getInt( 12 ) );
-                        baseHandler.setData( rs.getString( 13 ) );
                         baseHandler.setMaterialAliases( Prism.getItems() );
 
-                        // Set aggregate counts if a lookup
-                        int aggregated = 0;
-                        if( shouldGroup ) {
-                            aggregated = rs.getInt( 14 );
+                        // Set all shared values
+                        baseHandler.setType( actionType );
+                        baseHandler.setPlayerName( rs.getString( "player" ) );
+                        baseHandler.setBlockId( rs.getInt( "block_id" ) );
+                        baseHandler.setBlockSubId( rs.getInt( "block_subid" ) );
+                        
+                        // Group-only fields
+                        if( shouldGroup ){
+                            baseHandler.setAggregateCount( rs.getInt( "counted" ) );
                         }
-                        baseHandler.setAggregateCount( aggregated );
+                        
+                        // Non-grouped fields
+                        if( !shouldGroup ){
+                            baseHandler.setUnixEpoch( rs.getString( "epoch" ) );
+                            baseHandler.setWorldName( worldName );
+                            baseHandler.setX( rs.getInt( "x" ) );
+                            baseHandler.setY( rs.getInt( "y" ) );
+                            baseHandler.setZ( rs.getInt( "z" ) );
+                            baseHandler.setOldBlockId( rs.getInt( "old_block_id" ) );
+                            baseHandler.setOldBlockSubId( rs.getInt( "old_block_subid" ) );
+                            baseHandler.setData( rs.getString( "data" ) );
+                        }
 
                         actions.add( baseHandler );
 
