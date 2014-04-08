@@ -66,7 +66,10 @@ public class ActionMessage {
     public String[] getMessage() {
         
         boolean isGrouped = (a.getAggregateCount() > 0);
-        showExtended = !isGrouped; // can't show details if grouped
+        // can't show details if grouped
+        if( isGrouped ){
+            showExtended = false;
+        }
 
         String[] msg = new String[1];
         if( showExtended ) {
