@@ -5,7 +5,6 @@ import me.botsko.prism.appliers.ChangeResult;
 import me.botsko.prism.appliers.ChangeResultType;
 import me.botsko.prism.appliers.PrismProcessType;
 import me.botsko.prism.commandlibs.Flag;
-import me.botsko.prism.utils.BlockUtils;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -50,7 +49,7 @@ public class BlockChangeAction extends BlockAction {
     @Override
     public String getNiceName() {
         String name = "";
-        if( this.getType().getName().equals( "block-fade" ) ) {
+        if( this.getType().getName().equals( "block-fade" ) && this.old_block_id > 0 ) {
             name += materialAliases.getAlias( this.old_block_id, this.old_block_subid );
         } else {
             name += materialAliases.getAlias( this.block_id, this.block_subid );

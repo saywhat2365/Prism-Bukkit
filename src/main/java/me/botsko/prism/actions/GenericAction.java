@@ -178,6 +178,8 @@ public class GenericAction implements Handler {
      */
     @Override
     public void setUnixEpoch(Long epoch) {
+        
+        if( epoch == null ) return;
 
         this.epoch = String.valueOf(epoch);
 
@@ -227,6 +229,8 @@ public class GenericAction implements Handler {
     public String getTimeSince() {
 
         String time_ago = "";
+        
+        if( this.epoch == null || this.epoch.isEmpty() ) return time_ago;
 
         final Date start = new Date( Long.parseLong( this.epoch ) * 1000 );
         final Date end = new Date();

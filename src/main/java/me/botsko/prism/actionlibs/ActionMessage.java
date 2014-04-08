@@ -87,12 +87,15 @@ public class ActionMessage {
 	 * 
 	 */
     public String[] getMessage() {
+        
+        boolean isGrouped = (a.getAggregateCount() > 0);
+        showExtended = !isGrouped; // can't show details if grouped
 
         String[] msg = new String[1];
         if( showExtended ) {
             msg = new String[2];
         }
-
+       
         final ChatColor highlight = ChatColor.DARK_AQUA;
 
         String line1 = "";
@@ -134,28 +137,28 @@ public class ActionMessage {
         }
 
         // Time since
-        if( !a.getTimeSince().isEmpty() ) {
+        if( !isGrouped && !a.getTimeSince().isEmpty() ) {
             line1 += ChatColor.WHITE + " " + a.getTimeSince();
         }
 
         // Action type reminder
         line1 += " " + ChatColor.GRAY + "(a:" + a.getType().getShortName() + ")";
+        
+        msg[0] = line1;
 
         // Line 2
-        String line2 = ChatColor.GRAY + " --";
-
-        line2 += ChatColor.GRAY + " " + a.getId() + " - ";
-
-        // Date & Time
-        if( showExtended ) {
-            line2 += ChatColor.GRAY + a.getDisplayDate();
-            line2 += " " + ChatColor.GRAY + a.getDisplayTime().toLowerCase();
-
-            line2 += " - " + a.getWorldName() + " @ " + a.getX() + " " + a.getY() + " " + a.getZ() + " ";
-        }
-
-        msg[0] = line1;
-        if( showExtended ) {
+        if( showExtended ){
+            String line2 = ChatColor.GRAY + " --";
+    
+            line2 += ChatColor.GRAY + " " + a.getId() + " - ";
+    
+            // Date & Time
+            if( showExtended ) {
+                line2 += ChatColor.GRAY + a.getDisplayDate();
+                line2 += " " + ChatColor.GRAY + a.getDisplayTime().toLowerCase();
+    
+                line2 += " - " + a.getWorldName() + " @ " + a.getX() + " " + a.getY() + " " + a.getZ() + " ";
+            }
             msg[1] = line2;
         }
 
