@@ -32,6 +32,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     
     private static MongoClient mongoClient = null;
     private static String database;
+    private static DB db;
   
 
     /**
@@ -42,9 +43,8 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     protected static DBCollection getCollection( String collectionName ){
         try {
-            DB db = getDB();
             return db.getCollection(collectionName);
-        } catch( MongoException e ){
+        } catch( Exception e ){
             e.printStackTrace();
         }
         return null;
@@ -52,19 +52,16 @@ public class MongoStorageAdapter implements StorageAdapter {
     
     /**
      * 
-     * @param dbName
-     * @param collectionName
      * @return
      */
-    protected static DB getDB(){
-        DB db = null;
+    private boolean isServerReachable(){
         try {
-            db = mongoClient.getDB(database);
-            return db;
-        } catch( MongoException e ){
-            e.printStackTrace();
+            mongoClient.getConnector().getDBPortPool(mongoClient.getAddress()).get().ensureOpen();
+            return true;
+        } catch (Exception e) {
+          e.printStackTrace();
+          return false;
         }
-        return null;
     }
 
     /**
@@ -75,21 +72,34 @@ public class MongoStorageAdapter implements StorageAdapter {
         
         database = config.getString("prism.mongodb.database");
         
-        // Initialize database
+        // Init client
         try {
             mongoClient = new MongoClient(config.getString( "prism.mongodb.hostname" ),config.getInt( "prism.mongodb.port" ));
-            // boolean auth = db.authenticate(myUserName, myPassword);
-            
-            // Create indexes
-            getCollection("prismData").ensureIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("epoch",-1) );
-            getCollection("prismData").ensureIndex( new BasicDBObject("epoch",-1).append("action",1) );
-            
         } catch ( UnknownHostException e ) {
             e.printStackTrace();
             return false;
         }
-        
         if( mongoClient == null ) return false;
+
+        
+        // @todo support auth: boolean auth = db.authenticate(myUserName, myPassword);
+        // test connection
+        
+        if( !isServerReachable() ){
+            return false;
+        }
+        
+        // Connect to db
+        db = mongoClient.getDB( database );
+
+        // Create indexes
+        try {
+            getCollection("prismData").ensureIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("epoch",-1) );
+            getCollection("prismData").ensureIndex( new BasicDBObject("epoch",-1).append("action",1) );
+        } catch( Exception e ){
+            e.printStackTrace();
+            return false;
+        }
         
         return true;
 
