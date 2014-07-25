@@ -74,7 +74,7 @@ public class PlayerIdentification {
      * @param playerName
      * @return
      */
-    public static PrismPlayer getPrismPlayer( String playerName ){
+    private static PrismPlayer getPrismPlayer( String playerName ){
 
         Player player = Bukkit.getPlayer(playerName);
 
@@ -100,7 +100,7 @@ public class PlayerIdentification {
      * @param playerName
      * @return
      */
-    public static PrismPlayer getPrismPlayer( Player player ){
+    private static PrismPlayer getPrismPlayer( Player player ){
 
         if( player.getUniqueId() == null ){
             // If they have a name, we can attempt to find them that way
@@ -142,7 +142,7 @@ public class PlayerIdentification {
      * @param prismPlayer
      * @return
      */
-    protected static PrismPlayer comparePlayerToCache( Player player, PrismPlayer prismPlayer ){
+    private static PrismPlayer comparePlayerToCache( Player player, PrismPlayer prismPlayer ){
 
         // Compare for username differences, update database
         if( !player.getName().equals( prismPlayer.getName() ) ){

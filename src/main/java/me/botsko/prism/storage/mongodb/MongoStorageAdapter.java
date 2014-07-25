@@ -3,6 +3,7 @@ package me.botsko.prism.storage.mongodb;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
@@ -174,10 +175,17 @@ public class MongoStorageAdapter implements StorageAdapter {
                         // Some dependency injection
                         baseHandler.setPlugin( Bukkit.getPluginManager().getPlugin( "Prism" ) );
                         baseHandler.setMaterialAliases( Prism.getItems() );
+                        
+                        // Lookup player real name
+                        PrismPlayer prismPlayer = Prism.getPlayerStorageAdapter().lookupByUUID( UUID.fromString( (String) record.get( "player" ) ) );
+                        String playerName = "unknown";
+                        if( prismPlayer != null ){
+                            playerName = prismPlayer.getName();
+                        }
 
                         // Set all shared values
                         baseHandler.setType( actionType );
-                        baseHandler.setPlayerName( (String) record.get( "player" ) );
+                        baseHandler.setPlayerName( playerName );
                         baseHandler.setBlockId( (Integer) record.get( "block_id" ) );
                         baseHandler.setBlockSubId( (Integer) record.get( "block_subid" ) );
                         
@@ -231,7 +239,7 @@ public class MongoStorageAdapter implements StorageAdapter {
                     if( a.isCanceled() )
                         continue;
                     
-                    PrismPlayer player = PlayerIdentification.getPrismPlayer( a.getPlayerName() );
+                    PrismPlayer player = PlayerIdentification.cachePrismPlayer( a.getPlayerName() );
 
                     BasicDBObject doc = new BasicDBObject("world", a.getWorldName()).
                             append("action", a.getType().getName()).
@@ -334,7 +342,20 @@ public class MongoStorageAdapter implements StorageAdapter {
         
         // Players
         if( !parameters.getPlayerNames().isEmpty() ){
-            query.append( "player", new BasicDBObject("$in", parameters.getPlayerNames().keySet()) );
+            
+            // Find all IDs for players
+            List<String> matchIds = new ArrayList<String>();
+            DBCursor cursor = MongoStorageAdapter.getCollection("players").find( new BasicDBObject("nickname",parameters.getPlayerNames().keySet()) );
+            try {
+                while(cursor.hasNext()) {
+                    DBObject record = cursor.next();
+                    matchIds.add( (String) record.get("uuid") );
+                }
+            } finally {
+                cursor.close();
+            }
+            
+            query.append( "player", new BasicDBObject("$in", matchIds) );
         }
         
         // @todo:

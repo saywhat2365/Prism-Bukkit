@@ -37,7 +37,7 @@ public class MongoPlayerStorageAdapter implements PlayerStorageAdapter {
     public PrismPlayer addPlayer(String playerName){
         PrismPlayer fakePlayer = new PrismPlayer( 0, UUID.randomUUID(), playerName );
         addPlayer(fakePlayer);
-        return null;
+        return fakePlayer;
     }
     
     /**
