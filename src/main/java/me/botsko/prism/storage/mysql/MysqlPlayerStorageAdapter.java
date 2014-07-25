@@ -182,7 +182,6 @@ public class MysqlPlayerStorageAdapter implements PlayerStorageAdapter {
         return prismPlayer;
     }
     
-    
     /**
      * Loads `prism_players` ID for a player into our cache.
      */
@@ -211,7 +210,6 @@ public class MysqlPlayerStorageAdapter implements PlayerStorageAdapter {
         }
         return prismPlayer;
     }
-    
     
     /**
      * Build-load all online players into cache
@@ -250,5 +248,4 @@ public class MysqlPlayerStorageAdapter implements PlayerStorageAdapter {
             if(conn != null) try { conn.close(); } catch (SQLException e) {}
         }
     }
-
 }
