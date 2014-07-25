@@ -25,6 +25,8 @@ import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.ActionType;
 import me.botsko.prism.actionlibs.QueryParameters;
 import me.botsko.prism.actions.Handler;
+import me.botsko.prism.players.PlayerIdentification;
+import me.botsko.prism.players.PrismPlayer;
 import me.botsko.prism.storage.StorageAdapter;
 import me.botsko.prism.storage.StorageWriteResponse;
 
@@ -228,10 +230,12 @@ public class MongoStorageAdapter implements StorageAdapter {
 
                     if( a.isCanceled() )
                         continue;
+                    
+                    PrismPlayer player = PlayerIdentification.getPrismPlayer( a.getPlayerName() );
 
                     BasicDBObject doc = new BasicDBObject("world", a.getWorldName()).
                             append("action", a.getType().getName()).
-                            append("player", a.getPlayerName()).
+                            append("player", player.getUUID().toString()).
                             append("block_id",a.getBlockId()).
                             append("block_subid",a.getBlockSubId()).
                             append("old_block_id",a.getOldBlockId()).
@@ -285,8 +289,6 @@ public class MongoStorageAdapter implements StorageAdapter {
         BasicDBObject query = new BasicDBObject();
         
         // @todo add support for include/excludes
-        
-        // @todo properly chunk by epoch
         
         // Specific coords
         final ArrayList<Location> locations = parameters.getSpecificBlockLocations();

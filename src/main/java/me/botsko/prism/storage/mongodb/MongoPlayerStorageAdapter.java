@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 import me.botsko.prism.Prism;
 import me.botsko.prism.players.PlayerIdentification;
@@ -67,7 +68,8 @@ public class MongoPlayerStorageAdapter implements PlayerStorageAdapter {
         DBCursor cursor = MongoStorageAdapter.getCollection("players").find( new BasicDBObject("nickname",playerName) ).limit( 1 );
         try {
             while(cursor.hasNext()) {
-               player = new PrismPlayer( 0, UUID.fromString((String) cursor.next().get("uuid")), (String) cursor.next().get("nickname") );
+                DBObject record = cursor.next();
+                player = new PrismPlayer( 0, UUID.fromString((String) record.get("uuid")), (String) record.get("nickname") );
             }
         } finally {
             cursor.close();
@@ -84,7 +86,8 @@ public class MongoPlayerStorageAdapter implements PlayerStorageAdapter {
         DBCursor cursor = MongoStorageAdapter.getCollection("players").find( new BasicDBObject("uuid",uuid.toString()) ).limit( 1 );
         try {
             while(cursor.hasNext()) {
-               player = new PrismPlayer( 0, UUID.fromString((String) cursor.next().get("uuid")), (String) cursor.next().get("nickname") );
+                DBObject record = cursor.next();
+                player = new PrismPlayer( 0, UUID.fromString((String) record.get("uuid")), (String) record.get("nickname") );
             }
         } finally {
             cursor.close();
@@ -100,9 +103,10 @@ public class MongoPlayerStorageAdapter implements PlayerStorageAdapter {
         DBCursor cursor = MongoStorageAdapter.getCollection("players").find( new BasicDBObject("nickname",Bukkit.getServer().getOnlinePlayers()) );
         try {
             while(cursor.hasNext()) {
-                UUID playerUUID = UUID.fromString((String) cursor.next().get("uuid"));
-                PrismPlayer prismPlayer = new PrismPlayer( 0, playerUUID, (String) cursor.next().get("nickname") );
-                Prism.debug("Loaded player " + cursor.next().get("nickname") + ", id: " + cursor.next().get("uuid") + " into the cache.");
+                DBObject record = cursor.next();
+                UUID playerUUID = UUID.fromString((String) record.get("uuid"));
+                PrismPlayer prismPlayer = new PrismPlayer( 0, playerUUID, (String) record.get("nickname") );
+                Prism.debug("Loaded player " + record.get("nickname") + ", id: " + record.get("uuid") + " into the cache.");
                 PlayerIdentification.prismPlayers.put( playerUUID, prismPlayer );
             }
         } finally {
