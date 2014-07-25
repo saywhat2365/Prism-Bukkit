@@ -32,7 +32,7 @@ public class PrismWorldEvents implements Listener {
                 if( event.getPlayer() != null ) {
                     player = event.getPlayer().getName();
                 }
-                RecordingQueue.addToQueue( ActionFactory.create( type, block, player ) );
+                RecordingQueue.addToQueue( ActionFactory.createGrow(type, block, player) );
             }
         }
     }

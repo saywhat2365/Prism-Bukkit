@@ -8,17 +8,8 @@ import me.botsko.prism.appliers.ChangeResultType;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Horse;
+import org.bukkit.entity.*;
 import org.bukkit.entity.Horse.Variant;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.inventory.HorseInventory;
 import org.bukkit.inventory.ItemStack;
@@ -43,6 +34,7 @@ public class EntityAction extends GenericAction {
         public double jump;
         public String saddle;
         public String armor;
+        public double maxHealth;
     }
 
     /**
@@ -123,6 +115,29 @@ public class EntityAction extends GenericAction {
 
             }
 
+            // Ocelot details
+            if( entity instanceof Ocelot ) {
+                final Ocelot ocelot = (Ocelot) entity;
+
+                // Owner
+                if( ocelot.isTamed() ) {
+                    if( ocelot.getOwner() instanceof Player ) {
+                        this.actionData.taming_owner = ocelot.getOwner().getName();
+                    }
+                    if( ocelot.getOwner() instanceof OfflinePlayer ) {
+                        this.actionData.taming_owner = ocelot.getOwner().getName();
+                    }
+                }
+
+                // Cat type
+                this.actionData.var = ocelot.getCatType().toString().toLowerCase();
+
+                // Sitting
+                if ( ocelot.isSitting() ) {
+                    this.actionData.sitting = true;
+                }
+            }
+
             // Horse details
             if( entity instanceof Horse ) {
                 final Horse h = (Horse) entity;
@@ -133,6 +148,7 @@ public class EntityAction extends GenericAction {
                 this.actionData.dom = h.getDomestication();
                 this.actionData.maxDom = h.getMaxDomestication();
                 this.actionData.jump = h.getJumpStrength();
+                this.actionData.maxHealth = h.getMaxHealth();
 
                 final HorseInventory hi = h.getInventory();
 
@@ -241,6 +257,14 @@ public class EntityAction extends GenericAction {
     }
 
     /**
+     *
+     * @return
+     */
+    public Ocelot.Type getCatType() {
+        return Ocelot.Type.valueOf( actionData.var.toUpperCase() );
+    }
+
+    /**
      * 
      * @return
      */
@@ -259,7 +283,11 @@ public class EntityAction extends GenericAction {
         if( actionData.taming_owner != null ) {
             name += actionData.taming_owner + "'s ";
         }
-        name += actionData.entity_name;
+        if( (actionData.entity_name.equals("ocelot") || actionData.entity_name.equals("horse")) && actionData.var != null ) {
+            name += actionData.var.toLowerCase().replace("_", " ");
+        } else {
+            name += actionData.entity_name;
+        }
         if( this.actionData.newColor != null ) {
             name += " " + this.actionData.newColor;
         }
@@ -313,6 +341,14 @@ public class EntityAction extends GenericAction {
     public ItemStack getArmor() {
         if( this.actionData.armor != null ) { return new ItemStack( Integer.parseInt( this.actionData.armor ), 1 ); }
         return null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public double getMaxHealth() {
+        return this.actionData.maxHealth;
     }
 
     /**
@@ -389,6 +425,36 @@ public class EntityAction extends GenericAction {
                 }
             }
 
+            // Set ocelot details
+            if( entity instanceof Ocelot ) {
+
+                // Owner
+                final Ocelot ocelot = (Ocelot) entity;
+                final String tamingOwner = getTamingOwner();
+                if( tamingOwner != null ) {
+                    Player owner = plugin.getServer().getPlayer( tamingOwner );
+                    if( owner == null ) {
+                        final OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer( tamingOwner );
+                        if( offlinePlayer.hasPlayedBefore() ) {
+                            owner = offlinePlayer.getPlayer();
+                        }
+                    }
+                    if( owner != null ) {
+                        ocelot.setOwner(owner);
+                    }
+                }
+
+                // Cat type
+                if( getCatType() != null ) {
+                    ocelot.setCatType( getCatType() );
+                }
+
+                // Sitting
+                if ( isSitting() ) {
+                    ocelot.setSitting( true );
+                }
+            }
+
             // Set horse details
             if( entity instanceof Horse ) {
 
@@ -410,6 +476,7 @@ public class EntityAction extends GenericAction {
                 h.setDomestication( this.actionData.dom );
                 h.setMaxDomestication( this.actionData.maxDom );
                 h.setJumpStrength( this.actionData.jump );
+                h.setMaxHealth( this.actionData.maxHealth );
 
                 // Stuff
                 h.getInventory().setSaddle( getSaddle() );

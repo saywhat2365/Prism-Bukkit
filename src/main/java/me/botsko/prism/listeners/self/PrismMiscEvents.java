@@ -14,7 +14,6 @@ public class PrismMiscEvents implements Listener {
      */
     @EventHandler
     public void onPrismBlocksDrainEvent(final PrismBlocksDrainEvent event) {
-
 //        // Get all block changes for this event
 //        final ArrayList<BlockStateChange> blockStateChanges = event.getBlockStateChanges();
 //        if( !blockStateChanges.isEmpty() ) {
@@ -44,7 +43,6 @@ public class PrismMiscEvents implements Listener {
      */
     @EventHandler
     public void onPrismBlocksExtinguishEvent(final PrismBlocksExtinguishEvent event) {
-
 //        // Get all block changes for this event
 //        final ArrayList<BlockStateChange> blockStateChanges = event.getBlockStateChanges();
 //        if( !blockStateChanges.isEmpty() ) {

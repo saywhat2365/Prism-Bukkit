@@ -9,12 +9,12 @@ import me.botsko.prism.actions.Handler;
 public class RecordingTask implements Runnable {
 
     /**
-	 * 
+	 *
 	 */
     private final Prism plugin;
 
     /**
-     * 
+     *
      * @param plugin
      */
     public RecordingTask(Prism plugin) {
@@ -22,7 +22,7 @@ public class RecordingTask implements Runnable {
     }
 
     /**
-	 * 
+	 *
 	 */
     public void save() {
         if( !RecordingQueue.getQueue().isEmpty() ) {
@@ -61,6 +61,7 @@ public class RecordingTask implements Runnable {
                             + RecordingQueue.getQueue().size() );
                     break;
                 }
+
                 i++;
     			
     		}
@@ -70,10 +71,8 @@ public class RecordingTask implements Runnable {
     	}
     }
 
-   
-
     /**
-	 * 
+	 *
 	 */
     @Override
     public void run() {
@@ -82,7 +81,7 @@ public class RecordingTask implements Runnable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     protected int getTickDelayForNextBatch() {
@@ -99,7 +98,7 @@ public class RecordingTask implements Runnable {
     }
 
     /**
-	 * 
+	 *
 	 */
     protected void scheduleNextRecording() {
         if( !plugin.isEnabled() ) {

@@ -7,9 +7,20 @@ import java.sql.SQLException;
 
 import org.bukkit.entity.Player;
 
+import me.botsko.prism.Prism;
 import me.botsko.prism.storage.SettingsStorageAdapter;
 
 public class MysqlSettingsStorageAdapter implements SettingsStorageAdapter {
+    
+    protected final String prefix;
+    
+    
+    /**
+     * 
+     */
+    public MysqlSettingsStorageAdapter(){
+        prefix = Prism.config.getString("prism.mysql.prefix");
+    }
 
     /**
      * Namespaces a key by the player, if provided
@@ -42,7 +53,7 @@ public class MysqlSettingsStorageAdapter implements SettingsStorageAdapter {
         try {
 
             conn = MysqlStorageAdapter.dbc();
-            s = conn.prepareStatement( "DELETE FROM prism_meta WHERE k = ?" );
+            s = conn.prepareStatement( "DELETE FROM " + prefix + "meta WHERE k = ?" );
             s.setString( 1, getNamespacedKey( key, player ) );
             s.executeUpdate();
 
@@ -77,6 +88,7 @@ public class MysqlSettingsStorageAdapter implements SettingsStorageAdapter {
      * @return
      */
     public void saveSetting(String key, String value, Player player) {
+        String prefix = Prism.config.getString("prism.mysql.prefix");
         Connection conn = null;
         PreparedStatement s = null;
         try {
@@ -84,11 +96,11 @@ public class MysqlSettingsStorageAdapter implements SettingsStorageAdapter {
             String finalKey = getNamespacedKey( key, player );
 
             conn = MysqlStorageAdapter.dbc();
-            s = conn.prepareStatement( "DELETE FROM prism_meta WHERE k = ?" );
+            s = conn.prepareStatement( "DELETE FROM " + prefix + "meta WHERE k = ?" );
             s.setString( 1, finalKey );
             s.executeUpdate();
 
-            s = conn.prepareStatement( "INSERT INTO prism_meta (k,v) VALUES (?,?)" );
+            s = conn.prepareStatement( "INSERT INTO " + prefix + "meta (k,v) VALUES (?,?)" );
             s.setString( 1, finalKey );
             s.setString( 2, value );
             s.executeUpdate();
@@ -129,7 +141,7 @@ public class MysqlSettingsStorageAdapter implements SettingsStorageAdapter {
         try {
 
             conn = MysqlStorageAdapter.dbc();
-            s = conn.prepareStatement( "SELECT v FROM prism_meta WHERE k = ? LIMIT 0,1" );
+            s = conn.prepareStatement( "SELECT v FROM " + prefix + "meta WHERE k = ? LIMIT 0,1" );
             s.setString( 1, getNamespacedKey( key, player ) );
             rs = s.executeQuery();
 

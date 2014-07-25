@@ -8,18 +8,25 @@ import me.botsko.prism.actionlibs.QueryParameters;
 
 abstract public class QueryBuilder {
 
-    /**
-	 * 
-	 */
     protected List<String> columns = new ArrayList<String>();
     protected List<String> conditions = new ArrayList<String>();
-
-    protected final String tableNameData = "prism_data";
-    protected final String tableNameDataExtra = "prism_data_extra";
+    
+    protected final String prefix;
+    protected final String tableNameData;
+    protected final String tableNameDataExtra;
 
     protected QueryParameters parameters;
     protected boolean shouldGroup;
 
+    /**
+     * 
+     * @param plugin
+     */
+    public QueryBuilder(){
+        prefix = Prism.config.getString("prism.mysql.prefix");
+        tableNameData = prefix + "data";
+        tableNameDataExtra = prefix + "data_extra";
+    }
 
     /**
      * 

@@ -1,6 +1,6 @@
 name: Prism
 main: me.botsko.prism.Prism
-version: ${describe}
+version: ${pom.version}-${env.BUILD_NUMBER}
 softdepend: [WorldEdit,HeroChat]
 author: viveleroi
 website: http://discover-prism.com
@@ -211,3 +211,73 @@ permissions:
         default: false
     prism.ignore.tracking.xp-pickup:
         default: false
+    prism.parameters.*:
+        default: op
+        children:
+            prism.parameters.action: true
+            prism.parameters.before: true
+            prism.parameters.block: true
+            prism.parameters.entity: true
+            prism.parameters.id: true
+            prism.parameters.keyword: true
+            prism.parameters.player: true
+            prism.parameters.radius: true
+            prism.parameters.since: true
+            prism.parameters.world: true
+            prism.parameters.flag.*: true
+    prism.parameters.action:
+        default: op
+    prism.parameters.before:
+        default: op
+    prism.parameters.block:
+        default: op
+    prism.parameters.entity:
+        default: op
+    prism.parameters.id:
+        default: op
+    prism.parameters.keyword:
+        default: op
+    prism.parameters.player:
+        default: op
+    prism.parameters.radius:
+        default: op
+    prism.parameters.since:
+        default: op
+    prism.parameters.world:
+        default: op
+    prism.parameters.flag.*:
+        default: op
+        children:
+            prism.parameters.flag.drain: true
+            prism.parameters.flag.drain-lava: true
+            prism.parameters.flag.drain-water: true
+            prism.parameters.flag.extended: true
+            prism.parameters.flag.no-ext: true
+            prism.parameters.flag.no-itemclear: true
+            prism.parameters.flag.per-page: true
+            prism.parameters.flag.no-group: true
+            prism.parameters.flag.overwrite: true
+            prism.parameters.flag.share: true
+            prism.parameters.flag.paste: true
+    prism.parameters.flag.drain:
+        default: op
+    prism.parameters.flag.drain-lava:
+        default: op
+    prism.parameters.flag.drain-water:
+        default: op
+    prism.parameters.flag.extended:
+        default: op
+    prism.parameters.flag.no-ext:
+        default: op
+    prism.parameters.flag.no-itemclear:
+        default: op
+    prism.parameters.flag.per-page:
+        default: op
+    prism.parameters.flag.no-group:
+        default: op
+    prism.parameters.flag.overwrite:
+        default: op
+    prism.parameters.flag.share:
+        default: op
+    prism.parameters.flag.paste:
+        default: op

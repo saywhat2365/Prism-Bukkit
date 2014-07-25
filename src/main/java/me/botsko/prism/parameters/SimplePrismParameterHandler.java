@@ -2,6 +2,7 @@ package me.botsko.prism.parameters;
 
 import me.botsko.prism.actionlibs.QueryParameters;
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permissible;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -11,6 +12,8 @@ public abstract class SimplePrismParameterHandler implements PrismParameterHandl
     private final String name;
     private final Pattern inputMatcher;
     private final Set<String> aliases;
+
+    private String permission;
 
     /**
      * 
@@ -35,6 +38,7 @@ public abstract class SimplePrismParameterHandler implements PrismParameterHandl
         if( this.aliases.isEmpty() ) {
             this.aliases.add( this.name.toLowerCase() );
         }
+        permission = "prism.parameters." + name.toLowerCase();
     }
 
     /**
@@ -51,6 +55,20 @@ public abstract class SimplePrismParameterHandler implements PrismParameterHandl
     @Override
     public String[] getHelp() {
         return new String[0];
+    }
+
+    /**
+     * @return the permission required to use this parameter.
+     */
+    public String getPermission() {
+        return permission;
+    }
+
+    /**
+     * @param permission the permission required to use this parameter.
+     */
+    protected void setPermission(String permission) {
+        this.permission = permission;
     }
 
     /**
@@ -96,6 +114,9 @@ public abstract class SimplePrismParameterHandler implements PrismParameterHandl
 
     }
 
+    /**
+     * 
+     */
     @Override
     public final List<String> tabComplete(String partialParameter, CommandSender sender) {
         // Should never fail, applicable is called first
@@ -103,6 +124,8 @@ public abstract class SimplePrismParameterHandler implements PrismParameterHandl
         final String alias = split[0];
         final String input = split[1];
         final List<String> completions = tabComplete( alias, input, sender );
+        if(completions == null)
+            return Collections.emptyList();
         final List<String> edited = new ArrayList<String>( completions.size() );
         for ( final String completion : completions ) {
             edited.add( alias + ":" + completion );
@@ -110,7 +133,23 @@ public abstract class SimplePrismParameterHandler implements PrismParameterHandl
         return edited;
     }
 
+    /**
+     * 
+     * @param alias
+     * @param partialParameter
+     * @param sender
+     * @return
+     */
     protected List<String> tabComplete(String alias, String partialParameter, CommandSender sender) {
         return null;
+    }
+
+    /**
+     * 
+     */
+    @Override
+    public final boolean hasPermission(String parameter, Permissible permissible) {
+        if( permissible == null ) return true;
+        return permissible.hasPermission(permission);
     }
 }

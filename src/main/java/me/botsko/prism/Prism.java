@@ -159,7 +159,6 @@ public class Prism extends JavaPlugin {
             disablePlugin();
         }
 
-
         if( isEnabled() ) {
 
             // Plugins we use
@@ -188,11 +187,6 @@ public class Prism extends JavaPlugin {
 
             if( getConfig().getBoolean( "prism.tracking.api.enabled" ) ) {
                 getServer().getPluginManager().registerEvents( new PrismCustomEvents( this ), this );
-            }
-
-            // Assign Plugin listeners if enabled
-            if( dependencyEnabled( "Herochat" ) && getConfig().getBoolean( "prism.tracking.player-chat" ) ) {
-                getServer().getPluginManager().registerEvents( new PrismChannelChatEvents(), this );
             }
 
             // Assign listeners to our own events
@@ -317,13 +311,6 @@ public class Prism extends JavaPlugin {
 	 * 
 	 */
     private void checkPluginDependancies() {
-
-        // HeroChat
-        final Plugin herochat = getServer().getPluginManager().getPlugin( "Herochat" );
-        if( herochat != null ) {
-            enabledPlugins.add( "Herochat" );
-            log( "HeroChat found. Switching chat listener to HC events" );
-        }
 
         // WorldEdit
         final Plugin we = getServer().getPluginManager().getPlugin( "WorldEdit" );

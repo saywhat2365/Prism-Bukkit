@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import me.botsko.elixr.TypeUtils;
 import me.botsko.prism.Prism;
@@ -37,7 +38,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
      * DB Foreign key caches
      */
     private HashMap<String, Integer> prismWorlds = new HashMap<String, Integer>();
-    private HashMap<String, Integer> prismPlayers = new HashMap<String, Integer>();
+    private HashMap<UUID, Integer> prismPlayers = new HashMap<UUID, Integer>();
     private HashMap<String, Integer> prismActions = new HashMap<String, Integer>();
     
 	/**
@@ -758,7 +759,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
             public void run() {
 
                 String[] playerNames;
-                playerNames = new String[Bukkit.getServer().getOnlinePlayers().length];
+                playerNames = new String[Bukkit.getServer().getOnlinePlayers().size()];
                 int i = 0;
                 for ( final Player pl : Bukkit.getServer().getOnlinePlayers() ) {
                     playerNames[i] = pl.getName();

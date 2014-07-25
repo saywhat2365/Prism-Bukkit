@@ -53,8 +53,8 @@ public class PrismInventoryEvents implements Listener {
 
         // If hopper
         if( event.getInventory().getType().equals( InventoryType.HOPPER ) ) {
-            RecordingQueue.addToQueue( ActionFactory.create( "item-pickup", event.getItem().getItemStack(), event
-                    .getItem().getItemStack().getAmount(), -1, null, event.getItem().getLocation(), "hopper" ) );
+            RecordingQueue.addToQueue( ActionFactory.createItemStack("item-pickup", event.getItem().getItemStack(), event
+                    .getItem().getItemStack().getAmount(), -1, null, event.getItem().getLocation(), "hopper") );
         }
     }
 
@@ -121,18 +121,24 @@ public class PrismInventoryEvents implements Listener {
             containerLoc = chest.getLocation();
         }
 
-        // Prism.debug("--- Inv: " + (inv == null ? "null" : inv.toString()));
-        // Prism.debug("--- InvHold: " + (ih == null ? "null" : ih.toString()));
-        // Prism.debug("Raw slot: " + event.getRawSlot());
-        // Prism.debug("Slot: " + event.getSlot());
-        // Prism.debug("Def. Size " +
-        // event.getView().getType().getDefaultSize());
+//         Prism.debug("Raw slot: " + event.getRawSlot());
+//         Prism.debug("Slot: " + event.getSlot());
+//         Prism.debug("Def. Size " + event.getView().getType().getDefaultSize());
         // Prism.debug("Cursor Item: " + (cursoritem != null ?
         // cursoritem.getTypeId() : "null"));
         // Prism.debug("Current Item: " + (currentitem != null ?
         // currentitem.getTypeId() : "null"));
+        
+        // Double chests report 27 default size, though they actually
+        // have 6 rows of 9 for 54 slots
+        int defaultSize = event.getView().getType().getDefaultSize();
+        if( event.getInventory().getHolder() instanceof DoubleChest ){
+            defaultSize = event.getView().getType().getDefaultSize() * 2;
+        }
 
-        if( event.getSlot() == event.getRawSlot() && event.getRawSlot() <= event.getView().getType().getDefaultSize() ) {
+        // Click in the block inventory produces slot/rawslot that are equal, only until the slot numbers exceed the
+        // slot count of the inventory. At that point, they represent the player inv.
+        if( event.getSlot() == event.getRawSlot() && event.getRawSlot() <= defaultSize ) {
 
             // If BOTH items are not air then you've swapped an item. We need to
             // record an insert for the cursor item and
@@ -196,8 +202,8 @@ public class PrismInventoryEvents implements Listener {
 
         // Record it!
         if( actionType != null && containerLoc != null && item != null && item.getTypeId() != 0 && officialQuantity > 0 ) {
-            RecordingQueue.addToQueue( ActionFactory.create( actionType, item, officialQuantity, slot, null,
-                    containerLoc, player.getName() ) );
+            RecordingQueue.addToQueue( ActionFactory.createItemStack(actionType, item, officialQuantity, slot, null,
+                    containerLoc, player.getName()) );
         }
     }
 }
