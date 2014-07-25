@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.UUID;
 
-import me.botsko.elixr.TypeUtils;
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.ActionType;
 import me.botsko.prism.actionlibs.QueryParameters;
 import me.botsko.prism.actionlibs.RecordingManager;
 import me.botsko.prism.actions.Handler;
+import me.botsko.prism.players.PlayerIdentification;
+import me.botsko.prism.players.PrismPlayer;
 import me.botsko.prism.storage.StorageAdapter;
 import me.botsko.prism.storage.StorageWriteResponse;
 
@@ -25,7 +25,6 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
 public class MysqlStorageAdapter implements StorageAdapter {
 	
@@ -38,7 +37,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
      * DB Foreign key caches
      */
     private HashMap<String, Integer> prismWorlds = new HashMap<String, Integer>();
-    private HashMap<UUID, Integer> prismPlayers = new HashMap<UUID, Integer>();
     private HashMap<String, Integer> prismActions = new HashMap<String, Integer>();
     
 	/**
@@ -64,7 +62,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
 
         // Cache world IDs
         cacheWorldPrimaryKeys();
-        cacheOnlinePlayerPrimaryKeys();
         
         // ensure current worlds are added
         for ( final World w : Bukkit.getServer().getWorlds() ) {
@@ -424,7 +421,11 @@ public class MysqlStorageAdapter implements StorageAdapter {
                         action_id = prismActions.get( a.getType().getName() );
                     }
 
-                    final int player_id = getPlayerPrimaryKey( a.getPlayerName() );
+                    int player_id = 0;
+                    PrismPlayer prismPlayer = PlayerIdentification.cachePrismPlayer( a.getPlayerName() );
+                    if( prismPlayer != null ){
+                        player_id = prismPlayer.getId();
+                    }
 
                     if( world_id == 0 || action_id == 0 || player_id == 0 ) {
                         // @todo do something, error here
@@ -554,26 +555,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
             try {
                 conn.close();
             } catch ( final SQLException ignored ) {}
-        }
-    }
-	
-	
-	/**
-     * 
-     * @param playerName
-     * @return
-     */
-    private int getPlayerPrimaryKey(String playerName) {
-        try {
-            if( prismPlayers.containsKey( playerName ) ) {
-                return prismPlayers.get( playerName );
-            } else {
-                cachePlayerPrimaryKey( playerName );
-                return prismPlayers.get( playerName );
-            }
-        } catch ( final Exception e ) {
-            e.printStackTrace();
-            return 0;
         }
     }
 	
@@ -749,136 +730,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
         }
     }
 
-    /**
-	 * 
-	 */
-    public void cacheOnlinePlayerPrimaryKeys() {
-    	
-        Bukkit.getServer().getScheduler().runTaskAsynchronously( Bukkit.getPluginManager().getPlugin("Prism"), new Runnable() {
-            @Override
-            public void run() {
-
-                String[] playerNames;
-                playerNames = new String[Bukkit.getServer().getOnlinePlayers().size()];
-                int i = 0;
-                for ( final Player pl : Bukkit.getServer().getOnlinePlayers() ) {
-                    playerNames[i] = pl.getName();
-                    i++;
-                }
-
-                Connection conn = null;
-                PreparedStatement s = null;
-                ResultSet rs = null;
-                try {
-
-                    conn = dbc();
-                    s = conn.prepareStatement( "SELECT player_id, player FROM prism_players WHERE player IN ('"
-                            + TypeUtils.join( playerNames, "','" ) + "')" );
-                    rs = s.executeQuery();
-
-                    while ( rs.next() ) {
-                        Prism.debug( "Loaded player " + rs.getString( 2 ) + ", id: " + rs.getInt( 1 ) + " into the cache." );
-                        prismPlayers.put( rs.getString( 2 ), rs.getInt( 1 ) );
-                    }
-                } catch ( final SQLException e ) {
-                	e.printStackTrace();
-                } finally {
-                    if( rs != null )
-                        try {
-                            rs.close();
-                        } catch ( final SQLException e ) {}
-                    if( s != null )
-                        try {
-                            s.close();
-                        } catch ( final SQLException e ) {}
-                    if( conn != null )
-                        try {
-                            conn.close();
-                        } catch ( final SQLException e ) {}
-                }
-            }
-        } );
-    }
-
-    /**
-	 * 
-	 */
-    public void cachePlayerPrimaryKey(final String playerName) {
-
-        Connection conn = null;
-        PreparedStatement s = null;
-        ResultSet rs = null;
-        try {
-
-            conn = dbc();
-            s = conn.prepareStatement( "SELECT player_id FROM prism_players WHERE player = ?" );
-            s.setString( 1, playerName );
-            rs = s.executeQuery();
-
-            if( rs.next() ) {
-                Prism.debug( "Loaded player " + playerName + ", id: " + rs.getInt( 1 ) + " into the cache." );
-                prismPlayers.put( playerName, rs.getInt( 1 ) );
-            } else {
-                addPlayerName( playerName );
-            }
-        } catch ( final SQLException e ) {
-            e.printStackTrace();
-        } finally {
-            if( rs != null )
-                try {
-                    rs.close();
-                } catch ( final SQLException e ) {}
-            if( s != null )
-                try {
-                    s.close();
-                } catch ( final SQLException e ) {}
-            if( conn != null )
-                try {
-                    conn.close();
-                } catch ( final SQLException e ) {}
-        }
-    }
-
-    /**
-     * Saves a player name to the database, and adds the id to the cache hashmap
-     */
-    public void addPlayerName(String playerName) {
-
-        Connection conn = null;
-        PreparedStatement s = null;
-        ResultSet rs = null;
-        try {
-
-            conn = dbc();
-            s = conn.prepareStatement( "INSERT INTO prism_players (player) VALUES (?)", Statement.RETURN_GENERATED_KEYS );
-            s.setString( 1, playerName );
-            s.executeUpdate();
-
-            rs = s.getGeneratedKeys();
-            if( rs.next() ) {
-                Prism.debug( "Saved and loaded player " + playerName + " into the cache." );
-                prismPlayers.put( playerName, rs.getInt( 1 ) );
-            } else {
-                throw new SQLException( "Insert statement failed - no generated key obtained." );
-            }
-        } catch ( final SQLException e ) {
-            e.printStackTrace();
-        } finally {
-            if( rs != null )
-                try {
-                    rs.close();
-                } catch ( final SQLException e ) {}
-            if( s != null )
-                try {
-                    s.close();
-                } catch ( final SQLException e ) {}
-            if( conn != null )
-                try {
-                    conn.close();
-                } catch ( final SQLException e ) {}
-        }
-    }
-    
     
     /**
      * 

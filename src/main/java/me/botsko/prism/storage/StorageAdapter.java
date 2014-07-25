@@ -63,8 +63,6 @@ public interface StorageAdapter {
 	 */
 	public void addActionName(String actionName);
 	public void addWorldName(String worldName);
-	public void cachePlayerPrimaryKey(final String playerName);
-	public void addPlayerName(String playerName);
 	
 	
 	/**

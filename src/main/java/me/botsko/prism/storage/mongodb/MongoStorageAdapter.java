@@ -262,7 +262,6 @@ public class MongoStorageAdapter implements StorageAdapter {
         
     }
 
-    
     /**
      * Unused, only needed for foreign-key schemas
      */
@@ -270,17 +269,12 @@ public class MongoStorageAdapter implements StorageAdapter {
     public void addActionName(String actionName) {}
     @Override
     public void addWorldName(String worldName) {}
-    @Override
-    public void cachePlayerPrimaryKey(String playerName){}
-    @Override
-    public void addPlayerName(String playerName){}
 
     /**
      * 
      */
     @Override
     public void close() {}
-    
     
     /**
      * 

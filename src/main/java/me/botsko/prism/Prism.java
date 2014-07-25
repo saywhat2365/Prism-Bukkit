@@ -17,10 +17,13 @@ import me.botsko.prism.monitors.OreMonitor;
 import me.botsko.prism.monitors.UseMonitor;
 import me.botsko.prism.parameters.*;
 import me.botsko.prism.purge.PurgeManager;
+import me.botsko.prism.storage.PlayerStorageAdapter;
 import me.botsko.prism.storage.SettingsStorageAdapter;
 import me.botsko.prism.storage.StorageAdapter;
+import me.botsko.prism.storage.mongodb.MongoPlayerStorageAdapter;
 import me.botsko.prism.storage.mongodb.MongoSettingsStorageAdapter;
 import me.botsko.prism.storage.mongodb.MongoStorageAdapter;
+import me.botsko.prism.storage.mysql.MysqlPlayerStorageAdapter;
 import me.botsko.prism.storage.mysql.MysqlSettingsStorageAdapter;
 import me.botsko.prism.storage.mysql.MysqlStorageAdapter;
 import me.botsko.prism.wands.Wand;
@@ -70,6 +73,7 @@ public class Prism extends JavaPlugin {
     private PurgeManager purgeManager;
     private static StorageAdapter storageAdapter = null;
     private static SettingsStorageAdapter settingsStorageAdapter = null;
+    private static PlayerStorageAdapter playerStorageAdapter = null;
 
     /**
      * Public
@@ -143,10 +147,12 @@ public class Prism extends JavaPlugin {
         if( config.getString("prism.database.engine").equals("mysql") ){
         	storageAdapter = new MysqlStorageAdapter();
         	settingsStorageAdapter = new MysqlSettingsStorageAdapter();
+        	playerStorageAdapter = new MysqlPlayerStorageAdapter();
         }
         else if( config.getString("prism.database.engine").equals("mongodb") ){
             storageAdapter = new MongoStorageAdapter();
             settingsStorageAdapter = new MongoSettingsStorageAdapter();
+            playerStorageAdapter = new MongoPlayerStorageAdapter();
         }
 
         // Establish connection to database server
@@ -297,6 +303,13 @@ public class Prism extends JavaPlugin {
      */
     public static SettingsStorageAdapter getSettingsStorageAdapter(){
     	return settingsStorageAdapter;
+    }
+    
+    /**
+     * 
+     */
+    public static PlayerStorageAdapter getPlayerStorageAdapter(){
+        return playerStorageAdapter;
     }
 
     /**
