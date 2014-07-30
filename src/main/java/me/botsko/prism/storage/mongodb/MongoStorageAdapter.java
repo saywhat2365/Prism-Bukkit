@@ -1,7 +1,9 @@
 package me.botsko.prism.storage.mongodb;
 
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.Map.Entry;
@@ -97,8 +99,8 @@ public class MongoStorageAdapter implements StorageAdapter {
 
         // Create indexes
         try {
-            getCollection("prismData").ensureIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("epoch",-1) );
-            getCollection("prismData").ensureIndex( new BasicDBObject("epoch",-1).append("action",1) );
+            getCollection("prismData").ensureIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("created",-1) );
+            getCollection("prismData").ensureIndex( new BasicDBObject("created",-1).append("action",1) );
         } catch( Exception e ){
             e.printStackTrace();
             return false;
@@ -136,12 +138,18 @@ public class MongoStorageAdapter implements StorageAdapter {
                 BasicDBObject matcher = new BasicDBObject("$match",query);
 
                 int sortDir = parameters.getSortDirection().equals( "ASC" ) ? 1 : -1;
-                BasicDBObject sorter = new BasicDBObject( "$sort", new BasicDBObject("epoch",sortDir).append( "x", 1 ).append( "z", 1 ).append( "y", 1 ) );
+                BasicDBObject sorter = new BasicDBObject( "$sort", new BasicDBObject("created",sortDir).append( "x", 1 ).append( "z", 1 ).append( "y", 1 ) );
                 BasicDBObject limit = new BasicDBObject( "$limit", parameters.getLimit() );
                 
                 AggregationOutput aggregated = null;
                 if( shouldGroup ){
-                    BasicDBObject groupFields = new BasicDBObject("action","$action").append("player","$player").append("block_id","$block_id").append("block_subid","$block_subid");
+                    BasicDBObject groupFields = new BasicDBObject("action","$action")
+                    .append("player","$player")
+                    .append("block_id","$block_id")
+                    .append("block_subid","$block_subid")
+                    .append("dayOfMonth",new BasicDBObject("$dayOfMonth", "$created"))
+                    .append("month",new BasicDBObject("$month", "$created"))
+                    .append("year",new BasicDBObject("$year", "$created"));
                     BasicDBObject group = new BasicDBObject("$group", new BasicDBObject("_id",groupFields).append( "count", new BasicDBObject("$sum", 1) ) );
                     aggregated = getCollection("prismData").aggregate( matcher, group, sorter, limit );
                 } else {
@@ -158,9 +166,7 @@ public class MongoStorageAdapter implements StorageAdapter {
                     if( shouldGroup ){
                         record = (DBObject) record.get( "_id" );
                     }
-                    
-                    System.out.println( record );
-                    
+
                     if( record.get( "action" ) == null ) continue;
 
                     // Get the action handler
@@ -169,6 +175,8 @@ public class MongoStorageAdapter implements StorageAdapter {
                     if( actionType == null ) continue;
 
                     try {
+                        
+                        System.out.println( record );
 
                         final Handler baseHandler = Prism.getHandlerRegistry().getHandler( actionType.getHandler() );
                         
@@ -194,9 +202,13 @@ public class MongoStorageAdapter implements StorageAdapter {
                             baseHandler.setAggregateCount( (Integer) result.get( "count" ) );
                         }
                         
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        Date date = df.parse( record.get( "year" ) + "-" + record.get( "month" ) + "-" + record.get( "dayOfMonth" ) );
+                        long epoch = date.getTime();
+
                         // Non-grouped values
                         if( !shouldGroup ){
-                            baseHandler.setUnixEpoch( (Long) record.get( "epoch" ) );
+                            baseHandler.setUnixEpoch( epoch );
                             baseHandler.setWorldName( (String) record.get( "world" ) );
                             baseHandler.setX( (Double) record.get( "x" ) );
                             baseHandler.setY( (Double) record.get( "y" ) );
@@ -240,7 +252,7 @@ public class MongoStorageAdapter implements StorageAdapter {
                         continue;
                     
                     PrismPlayer player = PlayerIdentification.cachePrismPlayer( a.getPlayerName() );
-
+                    
                     BasicDBObject doc = new BasicDBObject("world", a.getWorldName()).
                             append("action", a.getType().getName()).
                             append("player", player.getUUID().toString()).
@@ -251,7 +263,7 @@ public class MongoStorageAdapter implements StorageAdapter {
                             append("x",a.getX()).
                             append("y",a.getY()).
                             append("z",a.getZ()).
-                            append("epoch",System.currentTimeMillis() / 1000L).
+                            append("created",new Date()).
                             append("data",a.getData());
                     
                     documents.add( doc );
@@ -323,10 +335,10 @@ public class MongoStorageAdapter implements StorageAdapter {
         // Time
         if( !parameters.getIgnoreTime() ){
             if( parameters.getBeforeTime() != null && parameters.getBeforeTime() > 0 ){
-                query.append( "epoch", new BasicDBObject("$lt", parameters.getBeforeTime()/1000) );
+                query.append( "created", new BasicDBObject("$lt", parameters.getBeforeTime()/1000) );
             }
             if( parameters.getSinceTime() != null && parameters.getSinceTime() > 0 ){
-                query.append( "epoch", new BasicDBObject("$gte", parameters.getSinceTime()/1000) );
+                query.append( "created", new BasicDBObject("$gte", parameters.getSinceTime()/1000) );
             }
         }
         
@@ -385,10 +397,10 @@ public class MongoStorageAdapter implements StorageAdapter {
     @Override
     public long getMinimumChunkingKey() {
         long minKey = 0;
-        DBCursor cursor = getCollection("prismData").find().sort( new BasicDBObject("epoch",1) ).limit( 1 );
+        DBCursor cursor = getCollection("prismData").find().sort( new BasicDBObject("created",1) ).limit( 1 );
         try {
             while(cursor.hasNext()) {
-                minKey = (Long) cursor.next().get("epoch");
+                minKey = (Long) cursor.next().get("created");
             }
         } finally {
             cursor.close();
@@ -403,10 +415,10 @@ public class MongoStorageAdapter implements StorageAdapter {
     public long getMaximumChunkingKey() {
         // @todo if before set, use it
         long maxKey = 0;
-        DBCursor cursor = getCollection("prismData").find().sort( new BasicDBObject("epoch",-1) ).limit( 1 );
+        DBCursor cursor = getCollection("prismData").find().sort( new BasicDBObject("created",-1) ).limit( 1 );
         try {
             while(cursor.hasNext()) {
-               maxKey = (Long) cursor.next().get("epoch");
+               maxKey = (Long) cursor.next().get("created");
             }
         } finally {
             cursor.close();
