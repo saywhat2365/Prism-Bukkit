@@ -1,452 +1,339 @@
 package me.botsko.prism.actionlibs;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import me.botsko.prism.appliers.PrismProcessType;
 import me.botsko.prism.commandlibs.Flag;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 
 /**
- * Query Parameters allows you to add values with which Prism will build the
- * database queries.
+ * An API for setting conditions for a records query.
  * 
  * @author botskonet
  * 
  */
 public class QueryParameters implements Cloneable {
-
-    /**
-     * Internal use
-     */
-    protected Set<String> foundArgs = new HashSet<String>();
-    protected PrismProcessType processType = PrismProcessType.LOOKUP;
-    protected final ArrayList<String> defaultsUsed = new ArrayList<String>();
-    protected String original_command;
-
-    /**
-     * Single-value options
-     */
-    protected boolean allow_no_radius = false;
-    protected int id = 0;
-//    protected int minId = 0;
-//    protected int maxId = 0;
-    protected Vector maxLoc;
-    protected Vector minLoc;
-    protected int parent_id = 0;
-    protected Location player_location;
-    protected int radius;
-    protected final ArrayList<Location> specific_block_locations = new ArrayList<Location>();
-    protected Long since_time;
-    protected Long before_time;
-    protected String world;
-    protected String keyword;
-    protected boolean ignoreTime;
-    protected long minChunkingId = 0;
-    protected long maxChunkingId = 0;
-
-    /**
-     * Params that allow multiple values
-     */
-    protected HashMap<String, MatchRule> actionTypeRules = new HashMap<String, MatchRule>();
-    protected final HashMap<Integer, Short> block_filters = new HashMap<Integer, Short>();
-    protected final HashMap<String, MatchRule> entity_filters = new HashMap<String, MatchRule>();
-    protected final HashMap<String, MatchRule> player_names = new HashMap<String, MatchRule>();
-    protected final ArrayList<Flag> flags = new ArrayList<Flag>();
-    protected final ArrayList<CommandSender> shared_players = new ArrayList<CommandSender>();
-
-    /**
-     * Pagination
-     */
-    protected int per_page = 5;
-    protected int limit = 1000000;
-
-    /**
-     * @return the id
-     */
-    public int getId() {
-        return id;
+    
+    public enum MatchRule {
+        INCLUDE, EXCLUDE, PARTIAL
     }
-
+    
+    // Conditions
+    protected World world = null;
+    protected CuboidRegion selectionRegion = null;
+    protected List<Location> specificLocations = new ArrayList<Location>();
+    protected List<ActionType> actionTypes = new ArrayList<ActionType>();
+    protected MatchRule actionsMatchRule = MatchRule.INCLUDE;
+    protected List<BlockFilter> blockFilters = new ArrayList<BlockFilter>();
+    protected List<OfflinePlayer> players = new ArrayList<OfflinePlayer>();
+    protected MatchRule playersMatchRule = MatchRule.INCLUDE;
+    protected Date minDate = null;
+    protected Date maxDate = null;
+    
+    // Query configs
+    protected PrismProcessType processType;
+    protected int limit;
+    protected int perPage;
+    protected List<Flag> flags = new ArrayList<Flag>();
+    
+    // WORLDS
+    
     /**
-     * @param id
-     *            the id to set
+     * Set the world condition using the String name of the world.
+     * @param worldName
+     * @throws IllegalArgumentException
      */
-    public void setId(int id) {
-        this.id = id;
-    }
-
-//    /**
-//     * 
-//     * @param minId
-//     */
-//    public void setMinPrimaryKey(int minId) {
-//        this.minId = minId;
-//    }
-//
-//    /**
-//     * 
-//     * @param minId
-//     */
-//    public int getMinPrimaryKey() {
-//        return this.minId;
-//    }
-//
-//    /**
-//     * 
-//     * @param maxId
-//     */
-//    public void setMaxPrimaryKey(int maxId) {
-//        this.maxId = maxId;
-//    }
-//
-//    /**
-//     * 
-//     * @param minId
-//     */
-//    public int getMaxPrimaryKey() {
-//        return this.maxId;
-//    }
-
-    /**
-     * @return the entity
-     */
-    public HashMap<String, MatchRule> getEntities() {
-        return entity_filters;
-    }
-
-    /**
-     * @param entity
-     *            the entity to set
-     */
-    public void addEntity(String entity) {
-        addEntity( entity, MatchRule.INCLUDE );
-    }
-
-    /**
-     * @param entity
-     *            the entity to set
-     */
-    public void addEntity(String entity, MatchRule match) {
-        this.entity_filters.put( entity, match );
-    }
-
-    /**
-     * @return the block
-     */
-    public HashMap<Integer, Short> getBlockFilters() {
-        return block_filters;
-    }
-
-    /**
-     * @param id
-     *            the block to set
-     */
-    public void addBlockFilter(int id, short data) {
-        this.block_filters.put( id, data );
-    }
-
-    /**
-     * @return the loc
-     */
-    public ArrayList<Location> getSpecificBlockLocations() {
-        return specific_block_locations;
-    }
-
-    /*
-     * @param loc the loc to set
-     */
-    public void setSpecificBlockLocation(Location loc) {
-        this.specific_block_locations.clear();
-        addSpecificBlockLocation( loc );
-    }
-
-    /**
-     * @param loc
-     *            the loc to set
-     */
-    public void addSpecificBlockLocation(Location loc) {
-        this.specific_block_locations.add( loc );
-    }
-
-    /**
-     * @return the player_location
-     */
-    public Location getPlayerLocation() {
-        return player_location;
-    }
-
-    /**
-     * 
-     * @param loc
-     */
-    public void setMinMaxVectorsFromPlayerLocation(Location loc) {
-        this.player_location = loc;
-        if( radius > 0 ) {
-            minLoc = new Vector( loc.getX() - radius, loc.getY() - radius, loc.getZ() - radius );
-            maxLoc = new Vector( loc.getX() + radius, loc.getY() + radius, loc.getZ() + radius );
+    public void setWorldByName( String worldName ) throws IllegalArgumentException {
+        World world = Bukkit.getWorld( worldName );
+        if( world == null ){
+            throw new IllegalArgumentException("No world found for the name " + worldName);
         }
+        setWorld(world);
     }
-
+    
     /**
-	 * 
-	 */
-    public void resetMinMaxVectors() {
-        minLoc = null;
-        maxLoc = null;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public Vector getMinLocation() {
-        return minLoc;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public void setMinLocation(Vector minLoc) {
-        this.minLoc = minLoc;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public Vector getMaxLocation() {
-        return maxLoc;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public void setMaxLocation(Vector maxLoc) {
-        this.maxLoc = maxLoc;
-    }
-
-    /**
-     * @return the radius
-     */
-    public int getRadius() {
-        return radius;
-    }
-
-    /**
-     * @param radius
-     *            the radius to set
-     */
-    public void setRadius(int radius) {
-        this.radius = radius;
-    }
-
-    /**
-     * @return the allow_no_radius
-     */
-    public boolean allowsNoRadius() {
-        return allow_no_radius;
-    }
-
-    /**
-     * @param allow_no_radius
-     *            the allow_no_radius to set
-     */
-    public void setAllowNoRadius(boolean allow_no_radius) {
-        this.allow_no_radius = allow_no_radius;
-    }
-
-    /**
-     * @return the player
-     */
-    public HashMap<String, MatchRule> getPlayerNames() {
-        return player_names;
-    }
-
-    /**
-     * @param player
-     *            the player to set
-     */
-    public void addPlayerName(String player) {
-        addPlayerName( player, MatchRule.INCLUDE );
-    }
-
-    /**
-     * @param player
-     *            the player to set
-     */
-    public void addPlayerName(String player, MatchRule match) {
-        this.player_names.put( player, match );
-    }
-
-    /**
-     * @return the world
-     */
-    public String getWorld() {
-        return world;
-    }
-
-    /**
+     * Limit query to a specific world name.
      * @param world
-     *            the world to set
      */
-    public void setWorld(String world) {
+    public void setWorld( World world ){
         this.world = world;
     }
-
+    
     /**
-     * @return the world
+     * Returns the specific world
+     * @return
      */
-    public String getKeyword() {
-        return keyword;
+    public World getWorld(){
+        return world;
+    }
+    
+    // LOCATIONS
+    
+    /**
+     * Define a region with a set radius around an origin location.
+     * @param origin
+     * @param blockRadius
+     * @throws IllegalArgumentException
+     */
+    public void setRadius( Location origin, int blockRadius ) throws IllegalArgumentException {
+        
+        if( blockRadius <= 0 ){
+            throw new IllegalArgumentException("Radius must be a positive value");
+        }
+        if( origin == null ){
+            throw new IllegalArgumentException("Origin Location may not be null");
+        }
+        if( specificLocations.size() > 0 ){
+            throw new IllegalArgumentException("Cannot set a region when any specific block locations exist.");
+        }
+        
+        setWorld( origin.getWorld() );
+        
+        Location min = new Location( origin.getWorld(), origin.getX() - blockRadius, origin.getY() - blockRadius, origin.getZ() - blockRadius );
+        Location max = new Location( origin.getWorld(), origin.getX() + blockRadius, origin.getY() + blockRadius, origin.getZ() + blockRadius );
+        
+        selectionRegion = new CuboidRegion(min,max);
+        
+    }
+    
+    /**
+     * Directly set a region
+     * @param selectionRegion
+     * @throws IllegalArgumentException
+     */
+    public void setSelectedRegion( CuboidRegion selectionRegion ) throws IllegalArgumentException {
+        if( selectionRegion == null ){
+            throw new IllegalArgumentException("Region may not be null");
+        }
+        this.selectionRegion = selectionRegion;
+    }
+    
+    /**
+     * Returns the region specificed via an origin + radius
+     * @return
+     */
+    public CuboidRegion getSelectedRegion(){
+        return selectionRegion;
     }
 
     /**
-     * @param keyword
-     *            the world to set
+     * Include only one or more specific locations
+     * @param loc
+     * @throws IllegalArgumentException
      */
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
+    public void addLocation( Location loc ) throws IllegalArgumentException {
+        if( loc == null ){
+            throw new IllegalArgumentException("Location may not be null");
+        }
+        if( selectionRegion != null ){
+            throw new IllegalArgumentException("Cannot add a block location when a region has been provided.");
+        }
+        specificLocations.add( loc );
+    }
+    
+    /**
+     * Returns a list of specific block locations
+     * @return
+     */
+    public List<Location> getLocations(){
+        return specificLocations;
+    }
+    
+    // ACTIONS
+    
+    /**
+     * Limit query to specific Prism action types.
+     * @param type
+     */
+    public void addActionType( ActionType type ) throws IllegalArgumentException {
+        if( type == null ){
+            throw new IllegalArgumentException("Action type may not be null");
+        }
+        this.actionTypes.add( type );
+    }
+    
+    /**
+     * Returns action types specified
+     * @return
+     */
+    public List<ActionType> getActionTypes(){
+        return actionTypes;
+    }
+    
+    /**
+     * Set a match rule for the list of players
+     * @param playersMatchRule
+     */
+    public void setActionTypesMatchRule( MatchRule playersMatchRule ){
+        this.actionsMatchRule = playersMatchRule;
+    }
+    
+    /**
+     * Returns the match rule we'll apply to the action types
+     * @return
+     */
+    public MatchRule getActionTypesMatchRule(){
+        return actionsMatchRule;
+    }
+    
+    // BLOCKS
+    
+    /**
+     * Filter by block Material type. This method assumes the durability/data value
+     * is 0.
+     * @param material
+     */
+    public void addBlock( Material material ) throws IllegalArgumentException {
+        if( material == null ){
+            throw new IllegalArgumentException("Block filter material may not be null");
+        }
+        addBlock( new BlockFilter(material,(short)0) );
+    }
+    
+    /**
+     * Filter by a custom block filter.
+     * @param filter
+     */
+    public void addBlock( BlockFilter filter ) throws IllegalArgumentException {
+        if( filter == null ){
+            throw new IllegalArgumentException("Block filter may not be null");
+        }
+        this.blockFilters.add( filter );
+    }
+    
+    /**
+     * Returns the list of block filters
+     * @return
+     */
+    public List<BlockFilter> getBlockFilters(){
+        return blockFilters;
+    }
+    
+    // PLAYA's
+    
+    /**
+     * Limit query to specific players. Be sure to use setPlayerMatchRule if you
+     * need to exclude or partially match players.
+     * @param player
+     */
+    public void addPlayer( OfflinePlayer player ) throws IllegalArgumentException {
+        if( player == null ){
+            throw new IllegalArgumentException("Player may not be null");
+        }
+        this.players.add( player );
+    }
+    
+    /**
+     * Set a match rule for the list of players
+     * @param playersMatchRule
+     */
+    public void setPlayerMatchRule( MatchRule playersMatchRule ){
+        this.playersMatchRule = playersMatchRule;
+    }
+    
+    /**
+     * Returns the list of player conditions
+     * @return
+     */
+    public List<OfflinePlayer> getPlayers(){
+        return players;
+    }
+    
+    /**
+     * Returns the match rule we'll apply to the player conditions
+     * @return
+     */
+    public MatchRule getPlayerMatchRule(){
+        return playersMatchRule;
+    }
+    
+    // DATES
+    
+    /**
+     * Query only records occurring after this date
+     * @param since
+     */
+    public void setMinimumDate( Date since ) throws IllegalArgumentException {
+        if( since == null ){
+            throw new IllegalArgumentException("Minimum date may not be null");
+        }
+        this.minDate = since;
+    }
+    
+    /**
+     * Returns the minimum "since" date
+     * @return
+     */
+    public Date getMinimumDate(){
+        return minDate;
+    }
+    
+    /**
+     * Query only records occurring before this date
+     * @param before
+     */
+    public void setMaximumDate( Date before ) throws IllegalArgumentException {
+        if( before == null ){
+            throw new IllegalArgumentException("Maximum date may not be null");
+        }
+        this.maxDate = before;
+    }
+    
+    /**
+     * Returns the maximum "before" date
+     * @return
+     */
+    public Date getMaximumDate(){
+        return maxDate;
     }
 
-    /**
-     * @return the action_type
-     */
-    public HashMap<String, MatchRule> getActionTypes() {
-        return actionTypeRules;
-    }
+
+//    public HashMap<String, MatchRule> getEntities() {
+//        return entity_filters;
+//    }
+//
+//
+//    public void addEntity(String entity, MatchRule match) {
+//        this.entity_filters.put( entity, match );
+//    }
+
+
+
+//    public String getKeyword() {
+//        return keyword;
+//    }
+//
+// 
+//    public void setKeyword(String keyword) {
+//        this.keyword = keyword;
+//    }
+
+
+   
+    
+    // CONFIGS, NOT CONDITIONS
 
     /**
-     * @return the action_type
+     * Indicates which applier process this query is for
+     * @return
      */
-    public HashMap<String, MatchRule> getActionTypeNames() {
-        return actionTypeRules;
-    }
-
-    /**
-     * @param action_type
-     *            the action_type to set
-     */
-    public void addActionType(String action_type) {
-        addActionType( action_type, MatchRule.INCLUDE );
-    }
-
-    /**
-     * @param action_type
-     *            the action_type to set
-     */
-    public void addActionType(String action_type, MatchRule match) {
-        this.actionTypeRules.put( action_type, match );
-    }
-
-    /**
-     * @return the action_type
-     */
-    public void removeActionType(ActionType a) {
-        actionTypeRules.remove( a.getName() );
-    }
-
-    /**
-	 * 
-	 */
-    public void resetActionTypes() {
-        actionTypeRules.clear();
-    }
-
-    /**
-     * @return the time
-     */
-    public Long getBeforeTime() {
-        return before_time;
-    }
-
-    /**
-     * @param time
-     *            the time to set
-     */
-    public void setBeforeTime(Long epoch) {
-        this.before_time = epoch;
-    }
-
-    /**
-     * @return the time
-     */
-    public Long getSinceTime() {
-        return since_time;
-    }
-
-    /**
-     * @param time
-     *            the time to set
-     */
-    public void setSinceTime(Long epoch) {
-        this.since_time = epoch;
-    }
-
-    /**
-     * @return the limit
-     */
-    public int getLimit() {
-        return limit;
-    }
-
-    /**
-     * @param limit
-     *            the limit to set
-     */
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
-
-    /**
-     * @return the lookup_type
-     */
-    public PrismProcessType getProcessType() {
+    public PrismProcessType getProcessType(){
         return processType;
     }
 
     /**
-     * @param lookup_type
-     *            the lookup_type to set
+     * Indicate which applier process this query is for
+     * @param processType
      */
-    public void setProcessType(PrismProcessType lookup_type) {
-        this.processType = lookup_type;
-    }
-
-    /**
-     * @return the foundArgs
-     */
-    public Set<String> getFoundArgs() {
-        return foundArgs;
-    }
-
-    /**
-     * @param foundArgs
-     *            the foundArgs to set
-     */
-    public void setFoundArgs(Set<String> foundArgs) {
-        this.foundArgs = foundArgs;
-    }
-
-    /**
-     * 
-     * @param id
-     */
-    public void setParentId(int id) {
-        this.parent_id = id;
-    }
-
-    /**
-	 *
-	 */
-    public int getParentId() {
-        return parent_id;
+    public void setProcessType( PrismProcessType processType ){
+        this.processType = processType;
     }
 
     /**
@@ -456,160 +343,137 @@ public class QueryParameters implements Cloneable {
      * 
      * @return
      */
-    public String getSortDirection() {
+    public String getSortDirection(){
         if( !this.processType.equals( PrismProcessType.RESTORE ) ) { return "DESC"; }
         return "ASC";
     }
-
+    
     /**
-     * 
+     * Limit the number of records returned
      * @return
      */
-    public void addFlag(Flag flag) {
-        if( hasFlag( flag ) )
-            return;
+    public int getLimit(){
+        return limit;
+    }
+
+    /**
+     * Set the max number of records to return
+     * @param limit
+     */
+    public void setLimit(int limit){
+        this.limit = limit;
+    }
+    
+    /**
+     * Sets a limit without any assumption of the current offset
+     * @return
+     */
+    public int getPerPage(){
+        return perPage;
+    }
+
+    /**
+     * Returns a limit without any assumption of the current offset
+     * @return
+     */
+    public void setPerPage( int perPage ){
+        this.perPage = perPage;
+    }
+
+    // FLAGS
+    
+    /**
+     * Add a query flag
+     * @param flag
+     */
+    public void addFlag( Flag flag ){
         this.flags.add( flag );
     }
 
     /**
-     * 
+     * Whether or not a specific flag was included
      * @param flag
      * @return
      */
     public boolean hasFlag(Flag flag) {
         return flags.contains( flag );
     }
-
-    /**
-	 * 
-	 */
-    public int getPerPage() {
-        return per_page;
-    }
-
-    /**
-     * 
-     * @param per_page
-     */
-    public void setPerPage(int per_page) {
-        this.per_page = per_page;
-    }
-
-    /**
-     * 
-     * @param d
-     */
-    public void addDefaultUsed(String d) {
-        defaultsUsed.add( d );
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public ArrayList<String> getDefaultsUsed() {
-        return defaultsUsed;
-    }
-
-    /**
-     * 
-     * @param args
-     */
-    public void setStringFromRawArgs(String[] args, int start) {
-        String params = "";
-        if( args.length > 0 ) {
-            for ( int i = start; i < args.length; i++ ) {
-                params += " " + args[i];
-            }
-        }
-        original_command = params;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    public String getOriginalCommand() {
-        return original_command;
-    }
-
-    /**
-     * Get the players that you're sharing your lookup with.
-     * 
-     * @return
-     */
-    public ArrayList<CommandSender> getSharedPlayers() {
-        return shared_players;
-    }
-
-    /**
-     * Set the players you're sharing the lookup with.
-     * 
-     * @param sender
-     */
-    public void addSharedPlayer(CommandSender sender) {
-        this.shared_players.add( sender );
-    }
     
 
-    /**
-     * Ignore the time.
-     * 
-     * @param ignore
-     */
-    public void setIgnoreTime(boolean ignore) {
-        this.ignoreTime = ignore;
-    }
+//  public Set<String> getFoundArgs() {
+//      return foundArgs;
+//  }
+//  public void setFoundArgs(Set<String> foundArgs) {
+//      this.foundArgs = foundArgs;
+//  }
+ 
 
-    /**
-     * Check if we are ignoring the time.
-     * 
-     * @return
-     */
-    public boolean getIgnoreTime() {
-        return ignoreTime;
-    }
+
+
+
+//    public void addDefaultUsed(String d) {
+//        defaultsUsed.add( d );
+//    }
+
+//    public ArrayList<String> getDefaultsUsed() {
+//        return defaultsUsed;
+//    }
+
+
+//    public void setStringFromRawArgs(String[] args, int start) {
+//        String params = "";
+//        if( args.length > 0 ) {
+//            for ( int i = start; i < args.length; i++ ) {
+//                params += " " + args[i];
+//            }
+//        }
+//        original_command = params;
+//    }
+
+ 
+//    public String getOriginalCommand() {
+//        return original_command;
+//    }
+
     
-    
-    /**
-     * 
-     * @param minId
-     */
-    public void setMinChunkingKey(long minId) {
-        this.minChunkingId = minId;
-    }
+//    public ArrayList<CommandSender> getSharedPlayers() {
+//        return shared_players;
+//    }
+//
+//    
+//    public void addSharedPlayer(CommandSender sender) {
+//        this.shared_players.add( sender );
+//    }
+//    
+//
+//    
+//    
+//    public void setMinChunkingKey(long minId) {
+//        this.minChunkingId = minId;
+//    }
+//
+//    
+//    public long getMinChunkingKey() {
+//        return this.minChunkingId;
+//    }
+//
+//    
+//    public void setMaxChunkingKey(long maxId) {
+//        this.maxChunkingId = maxId;
+//    }
+//
+//    
+//    public long getMaxChunkingKey() {
+//        return this.maxChunkingId;
+//    }
 
-    /**
-     * 
-     * @param minId
-     */
-    public long getMinChunkingKey() {
-        return this.minChunkingId;
-    }
-
-    /**
-     * 
-     * @param maxId
-     */
-    public void setMaxChunkingKey(long maxId) {
-        this.maxChunkingId = maxId;
-    }
-
-    /**
-     * 
-     * @param minId
-     */
-    public long getMaxChunkingKey() {
-        return this.maxChunkingId;
-    }
-
-    /**
-	 * 
-	 */
-    @Override
-    public QueryParameters clone() throws CloneNotSupportedException {
-        final QueryParameters cloned = (QueryParameters) super.clone();
-        cloned.actionTypeRules = new HashMap<String, MatchRule>( actionTypeRules );
-        return cloned;
-    }
+//    /**
+//	 * 
+//	 */
+//    @Override
+//    public QueryParameters clone() throws CloneNotSupportedException {
+//        final QueryParameters cloned = (QueryParameters) super.clone();
+//        cloned.actionTypeRules = new HashMap<String, MatchRule>( actionTypeRules );
+//        return cloned;
+//    }
 }

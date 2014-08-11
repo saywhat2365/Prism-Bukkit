@@ -1,10 +1,13 @@
 package me.botsko.prism.commandlibs;
 
 import me.botsko.prism.Prism;
-import me.botsko.prism.actionlibs.MatchRule;
 import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QueryParameters.MatchRule;
 import me.botsko.prism.appliers.PrismProcessType;
 import me.botsko.prism.parameters.PrismParameterHandler;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -145,12 +148,16 @@ public class PreprocessArgs {
             // feature of minecraft. Using p: prevents it.
             final Player autoFillPlayer = plugin.getServer().getPlayer( arg );
             if( autoFillPlayer != null ) {
-                MatchRule match = MatchRule.INCLUDE;
+                // Match
                 if( arg.startsWith( "!" ) ) {
-                    match = MatchRule.EXCLUDE;
+                    parameters.setPlayerMatchRule( MatchRule.EXCLUDE );
                 }
-                result = ParseResult.Found;
-                parameters.addPlayerName( arg.replace( "!", "" ), match );
+                // Find player
+                OfflinePlayer player = Bukkit.getOfflinePlayer( arg.replace( "!", "" ) );
+                if( player != null ){
+                    result = ParseResult.Found;
+                    parameters.addPlayer( player );
+                }
             }
         }
 

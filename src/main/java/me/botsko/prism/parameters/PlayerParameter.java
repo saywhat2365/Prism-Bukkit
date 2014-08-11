@@ -1,8 +1,10 @@
 package me.botsko.prism.parameters;
 
-import me.botsko.prism.actionlibs.MatchRule;
 import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QueryParameters.MatchRule;
+
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -24,22 +26,28 @@ public class PlayerParameter extends SimplePrismParameterHandler {
 	 */
     @Override
     public void process(QueryParameters query, String alias, String input, CommandSender sender) {
-        MatchRule match = MatchRule.INCLUDE;
+ 
         if( input.startsWith( "!" ) ) {
-            match = MatchRule.EXCLUDE;
+            query.setPlayerMatchRule( MatchRule.EXCLUDE );
             input = input.replace( "!", "" );
         } else if( input.startsWith( "~" ) ) {
-            match = MatchRule.PARTIAL;
+            query.setPlayerMatchRule( MatchRule.PARTIAL );
             input = input.replace( "~", "" );
         }
         final String[] playerNames = input.split( "," );
         if( playerNames.length > 0 ) {
             for ( String playerName : playerNames ) {
-                query.addPlayerName( playerName, match );
+                OfflinePlayer player = Bukkit.getOfflinePlayer( playerName );
+                if( player == null ) continue;
+                // @todo error if null
+                query.addPlayer( player );
             }
         }
     }
 
+    /**
+     * 
+     */
     @Override
     protected List<String> tabComplete(String alias, String partialParameter, CommandSender sender) {
         String prefix = "";

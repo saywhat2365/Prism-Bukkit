@@ -208,7 +208,7 @@ public class Preview implements Previewable {
                 }
                 if( show_nearby ) {
                     // Inform nearby players
-                    plugin.notifyNearby( player, parameters.getRadius(), player.getDisplayName() + " is performing a "
+                    plugin.notifyNearby( player, parameters.getSelectedRegion().getAverageRadius(), player.getDisplayName() + " is performing a "
                             + processType.name().toLowerCase() + " near you." );
                     // Inform staff
                     if( plugin.getConfig().getBoolean( "prism.alerts.alert-staff-to-applied-process" ) ) {
@@ -435,14 +435,13 @@ public class Preview implements Previewable {
 	 */
     protected void moveEntitiesToSafety() {
         if( parameters.getWorld() != null && player != null ) {
-            final List<Entity> entities = player.getNearbyEntities( parameters.getRadius(), parameters.getRadius(),
-                    parameters.getRadius() );
+            int avgRadius = parameters.getSelectedRegion().getAverageRadius();
+            final List<Entity> entities = player.getNearbyEntities( avgRadius, avgRadius, avgRadius );
             entities.add( player );
             for ( final Entity entity : entities ) {
                 if( entity instanceof LivingEntity ) {
                     int add = 0;
-                    if( EntityUtils.inCube( parameters.getPlayerLocation(), parameters.getRadius(),
-                            entity.getLocation() ) ) {
+                    if( EntityUtils.inCube( parameters.getSelectedRegion(), entity.getLocation() ) ) {
                         final Location l = entity.getLocation();
                         while ( !EntityUtils.playerMayPassThrough( l.getBlock().getType() ) ) {
                             add++;

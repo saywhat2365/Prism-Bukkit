@@ -66,8 +66,8 @@ public class RestoreWand extends QueryWandBase implements Wand {
                     .playerError( "Error retrieving parameters. Checking with default parameters." ) );
         }
 
-        params.setWorld( player.getWorld().getName() );
-        params.setSpecificBlockLocation( block.getLocation() );
+        params.setWorld( player.getWorld() );
+        params.addLocation( block.getLocation() );
         params.setLimit( 1 );
         params.setProcessType( PrismProcessType.RESTORE );
 

@@ -1,6 +1,7 @@
 package me.botsko.prism.utils;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,9 +13,9 @@ public class DateUtil {
      * 
      * @return
      */
-    public static Long translateTimeStringToDate(String arg_value) {
+    public static Date translateTimeStringToDate(String arg_value) {
 
-        Long dateFrom = 0L;
+        Date dateFrom = null;
 
         final Pattern p = Pattern.compile( "([0-9]+)(s|h|m|d|w)" );
         final Calendar cal = Calendar.getInstance();
@@ -47,7 +48,7 @@ public class DateUtil {
                     }
                 }
             }
-            dateFrom = cal.getTime().getTime();
+            dateFrom = cal.getTime();
         }
 
         return dateFrom;

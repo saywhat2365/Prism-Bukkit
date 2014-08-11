@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.ActionMessage;
+import me.botsko.prism.actionlibs.ActionType;
 import me.botsko.prism.actionlibs.ActionsQuery;
-import me.botsko.prism.actionlibs.MatchRule;
 import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QueryParameters.MatchRule;
 import me.botsko.prism.actionlibs.QueryResult;
 import me.botsko.prism.commandlibs.Flag;
 
@@ -71,13 +72,13 @@ public class InspectorWand extends QueryWandBase implements Wand {
                     player.sendMessage( Prism.messenger
                             .playerError( "Error retrieving parameters. Checking with default parameters." ) );
                 }
-                params.setWorld( player.getWorld().getName() );
-                params.setSpecificBlockLocation( loc );
+                params.setWorld( player.getWorld() );
+                params.addLocation( loc );
 
                 // Do we need a second location? (For beds, doors, etc)
                 final Block sibling = me.botsko.elixr.BlockUtils.getSiblingForDoubleLengthBlock( block );
                 if( sibling != null ) {
-                    params.addSpecificBlockLocation( sibling.getLocation() );
+                    params.addLocation( sibling.getLocation() );
                 }
 
                 // Ignoring any actions via config?
@@ -87,8 +88,9 @@ public class InspectorWand extends QueryWandBase implements Wand {
                             "prism.wands.inspect.ignore-actions" );
                     if( ignoreActions != null && !ignoreActions.isEmpty() ) {
                         for ( final String ignore : ignoreActions ) {
-                            params.addActionType( ignore, MatchRule.EXCLUDE );
+                            params.addActionType( ignore );
                         }
+                        params.setActionTypesMatchRule( MatchRule.EXCLUDE );
                     }
                 }
                 boolean timeDefault = false;

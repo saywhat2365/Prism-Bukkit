@@ -2,10 +2,11 @@ package me.botsko.prism.parameters;
 
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.ActionType;
-import me.botsko.prism.actionlibs.MatchRule;
 import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QueryParameters.MatchRule;
 import me.botsko.prism.appliers.PrismProcessType;
 import me.botsko.prism.utils.LevenshteinDistance;
+
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

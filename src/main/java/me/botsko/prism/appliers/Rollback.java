@@ -47,10 +47,10 @@ public class Rollback extends Preview {
 
             // Remove any fire at this location
             if( plugin.getConfig().getBoolean( "prism.appliers.remove-fire-on-burn-rollback" )
-                    && parameters.getActionTypes().containsKey( "block-burn" ) ) {
+                    && parameters.getActionTypes().contains( "block-burn" ) ) {
                 if( !parameters.hasFlag( Flag.NO_EXT ) ) {
                     final ArrayList<BlockStateChange> blockStateChanges = BlockUtils.extinguish( player.getLocation(),
-                            parameters.getRadius() );
+                            parameters.getSelectedRegion().getAverageRadius() );
                     if( blockStateChanges != null && !blockStateChanges.isEmpty() ) {
                         player.sendMessage( Prism.messenger.playerHeaderMsg( "Extinguishing fire!" + ChatColor.GRAY
                                 + " Like a boss." ) );
@@ -63,7 +63,7 @@ public class Rollback extends Preview {
                     && ( parameters.getActionTypes().containsKey( "tnt-explode" ) || parameters.getActionTypes()
                             .containsKey( "creeper-explode" ) ) ) {
                 if( !parameters.hasFlag( Flag.NO_ITEMCLEAR ) ) {
-                    final int removed = EntityUtils.removeNearbyItemDrops( player, parameters.getRadius() );
+                    final int removed = EntityUtils.removeNearbyItemDrops( player, parameters.getSelectedRegion().getAverageRadius() );
                     if( removed > 0 ) {
                         player.sendMessage( Prism.messenger.playerHeaderMsg( "Removed " + removed
                                 + " drops in affected area." + ChatColor.GRAY + " Like a boss." ) );
@@ -74,13 +74,13 @@ public class Rollback extends Preview {
             // Remove any liquid at this location
             ArrayList<BlockStateChange> drained = null;
             if( parameters.hasFlag( Flag.DRAIN ) ) {
-                drained = BlockUtils.drain( player.getLocation(), parameters.getRadius() );
+                drained = BlockUtils.drain( player.getLocation(), parameters.getSelectedRegion().getAverageRadius() );
             }
             if( parameters.hasFlag( Flag.DRAIN_LAVA ) ) {
-                drained = BlockUtils.drainlava( player.getLocation(), parameters.getRadius() );
+                drained = BlockUtils.drainlava( player.getLocation(), parameters.getSelectedRegion().getAverageRadius() );
             }
             if( parameters.hasFlag( Flag.DRAIN_WATER ) ) {
-                drained = BlockUtils.drainwater( player.getLocation(), parameters.getRadius() );
+                drained = BlockUtils.drainwater( player.getLocation(), parameters.getSelectedRegion().getAverageRadius() );
             }
             if( drained != null && drained.size() > 0 ) {
                 player.sendMessage( Prism.messenger.playerHeaderMsg( "Draining liquid!" + ChatColor.GRAY

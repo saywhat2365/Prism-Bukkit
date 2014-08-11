@@ -1,11 +1,14 @@
 package me.botsko.prism.bridge;
 
 import me.botsko.prism.Prism;
+import me.botsko.prism.actionlibs.CuboidRegion;
 import me.botsko.prism.actionlibs.QueryParameters;
 import me.botsko.prism.appliers.PrismProcessType;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalPlayer;
@@ -34,12 +37,12 @@ public class WorldEditBridge {
         } catch ( final IncompleteRegionException e ) {
             return false;
         }
+        
+        World world = Bukkit.getWorld( region.getWorld().getName() );
 
         // Set WorldEdit locations
-        final Vector minLoc = new Vector( region.getMinimumPoint().getX(), region.getMinimumPoint().getY(), region
-                .getMinimumPoint().getZ() );
-        final Vector maxLoc = new Vector( region.getMaximumPoint().getX(), region.getMaximumPoint().getY(), region
-                .getMaximumPoint().getZ() );
+        final Location minLoc = new Location( world, region.getMinimumPoint().getX(), region.getMinimumPoint().getY(), region.getMinimumPoint().getZ() );
+        final Location maxLoc = new Location( world, region.getMaximumPoint().getX(), region.getMaximumPoint().getY(), region.getMaximumPoint().getZ() );
 
         // Check selection against max radius
         final Selection sel = Prism.plugin_worldEdit.getSelection( player );
@@ -57,11 +60,7 @@ public class WorldEditBridge {
                 && !player.hasPermission( "prism.override-max-" + procType + "-radius" ) ) {
             return false;
         } else {
-
-            parameters.setWorld( region.getWorld().getName() );
-            parameters.setMinLocation( minLoc );
-            parameters.setMaxLocation( maxLoc );
-
+            parameters.setSelectedRegion( new CuboidRegion(minLoc,maxLoc) );
         }
         return true;
     }
