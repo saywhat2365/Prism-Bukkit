@@ -64,12 +64,10 @@ public interface StorageAdapter {
 	public void addActionName(String actionName);
 	public void addWorldName(String worldName);
 	
-	
 	/**
 	 * Close connections.
 	 */
 	public void close();
-	
 	
 	/**
 	 * Test the connection, returns true if valid and ready, false

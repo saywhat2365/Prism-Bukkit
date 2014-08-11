@@ -14,7 +14,6 @@ public class MysqlSettingsStorageAdapter implements SettingsStorageAdapter {
     
     protected final String prefix;
     
-    
     /**
      * 
      */

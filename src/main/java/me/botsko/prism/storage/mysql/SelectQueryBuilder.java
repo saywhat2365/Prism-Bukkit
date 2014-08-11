@@ -24,7 +24,6 @@ public class SelectQueryBuilder extends QueryBuilder {
         this.prismActions = prismActions;
     }
 
-
     /**
      * 
      * @return

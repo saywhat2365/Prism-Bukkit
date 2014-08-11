@@ -41,7 +41,6 @@ public class MysqlPlayerStorageAdapter implements PlayerStorageAdapter {
         return UUID.fromString(completeUuid);
     }
     
-    
     /**
      * Saves a real player's UUID and current Username to the `prism_players`
      * table. At this stage, we're pretty sure the UUID and username do not
@@ -81,7 +80,6 @@ public class MysqlPlayerStorageAdapter implements PlayerStorageAdapter {
         }
         return prismPlayer;
     }
-    
     
     /**
      * Saves a fake player's name and generated UUID to the `prism_players`

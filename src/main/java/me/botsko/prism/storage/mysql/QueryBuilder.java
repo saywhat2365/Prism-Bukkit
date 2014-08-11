@@ -10,11 +10,9 @@ abstract public class QueryBuilder {
 
     protected List<String> columns = new ArrayList<String>();
     protected List<String> conditions = new ArrayList<String>();
-    
     protected final String prefix;
     protected final String tableNameData;
     protected final String tableNameDataExtra;
-
     protected QueryParameters parameters;
     protected boolean shouldGroup;
 

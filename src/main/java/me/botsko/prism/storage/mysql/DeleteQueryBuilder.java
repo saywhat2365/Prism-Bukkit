@@ -3,7 +3,6 @@ package me.botsko.prism.storage.mysql;
 import java.util.HashMap;
 
 public class DeleteQueryBuilder extends SelectQueryBuilder {
-
     
     /**
      * 

@@ -33,6 +33,8 @@ public class MysqlStorageAdapter implements StorageAdapter {
      */
     private static DataSource pool = new DataSource();
     private SelectQueryBuilder qb;
+    private String prefix = Prism.config.getString("prism.mysql.prefix");
+    
     /**
      * DB Foreign key caches
      */
@@ -128,7 +130,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                 return;
 
             // actions
-            String query = "CREATE TABLE IF NOT EXISTS `prism_actions` ("
+            String query = "CREATE TABLE IF NOT EXISTS `"+prefix+"actions` ("
                     + "`action_id` int(10) unsigned NOT NULL AUTO_INCREMENT," + "`action` varchar(25) NOT NULL,"
                     + "PRIMARY KEY (`action_id`)," + "UNIQUE KEY `action` (`action`)"
                     + ") ENGINE=InnoDB  DEFAULT CHARSET=utf8;";
@@ -136,7 +138,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
             st.executeUpdate( query );
 
             // data
-            query = "CREATE TABLE IF NOT EXISTS `prism_data` (" + "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
+            query = "CREATE TABLE IF NOT EXISTS `"+prefix+"data` (" + "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
                     + "`epoch` int(10) unsigned NOT NULL," + "`action_id` int(10) unsigned NOT NULL,"
                     + "`player_id` int(10) unsigned NOT NULL," + "`world_id` int(10) unsigned NOT NULL,"
                     + "`x` int(11) NOT NULL," + "`y` int(11) NOT NULL," + "`z` int(11) NOT NULL,"
@@ -151,11 +153,11 @@ public class MysqlStorageAdapter implements StorageAdapter {
             // re-adding foreign key stuff)
             final DatabaseMetaData metadata = conn.getMetaData();
             ResultSet resultSet;
-            resultSet = metadata.getTables( null, null, "prism_data_extra", null );
+            resultSet = metadata.getTables( null, null, ""+prefix+"data_extra", null );
             if( !resultSet.next() ) {
 
                 // extra data
-                query = "CREATE TABLE IF NOT EXISTS `prism_data_extra` ("
+                query = "CREATE TABLE IF NOT EXISTS `"+prefix+"data_extra` ("
                         + "`extra_id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
                         + "`data_id` int(10) unsigned NOT NULL," + "`data` text NULL," + "`te_data` text NULL,"
                         + "PRIMARY KEY (`extra_id`)," + "KEY `data_id` (`data_id`)"
@@ -163,25 +165,25 @@ public class MysqlStorageAdapter implements StorageAdapter {
                 st.executeUpdate( query );
 
                 // add extra data delete cascade
-                query = "ALTER TABLE `prism_data_extra` ADD CONSTRAINT `prism_data_extra_ibfk_1` FOREIGN KEY (`data_id`) REFERENCES `prism_data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;";
+                query = "ALTER TABLE `"+prefix+"data_extra` ADD CONSTRAINT `"+prefix+"data_extra_ibfk_1` FOREIGN KEY (`data_id`) REFERENCES `"+prefix+"data` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;";
                 st.executeUpdate( query );
             }
 
             // meta
-            query = "CREATE TABLE IF NOT EXISTS `prism_meta` (" + "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
+            query = "CREATE TABLE IF NOT EXISTS `"+prefix+"meta` (" + "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
                     + "`k` varchar(25) NOT NULL," + "`v` varchar(255) NOT NULL," + "PRIMARY KEY (`id`)"
                     + ") ENGINE=InnoDB  DEFAULT CHARSET=utf8;";
             st.executeUpdate( query );
 
             // players
-            query = "CREATE TABLE IF NOT EXISTS `prism_players` ("
+            query = "CREATE TABLE IF NOT EXISTS `"+prefix+"players` ("
                     + "`player_id` int(10) unsigned NOT NULL AUTO_INCREMENT," + "`player` varchar(255) NOT NULL,"
                     + "PRIMARY KEY (`player_id`)," + "UNIQUE KEY `player` (`player`)"
                     + ") ENGINE=InnoDB  DEFAULT CHARSET=utf8;";
             st.executeUpdate( query );
 
             // worlds
-            query = "CREATE TABLE IF NOT EXISTS `prism_worlds` ("
+            query = "CREATE TABLE IF NOT EXISTS `"+prefix+"worlds` ("
                     + "`world_id` int(10) unsigned NOT NULL AUTO_INCREMENT," + "`world` varchar(255) NOT NULL,"
                     + "PRIMARY KEY (`world_id`)," + "UNIQUE KEY `world` (`world`)"
                     + ") ENGINE=InnoDB  DEFAULT CHARSET=utf8;";
@@ -401,7 +403,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
                 // Connection valid, proceed
                 conn.setAutoCommit( false );
                 s = conn.prepareStatement(
-                        "INSERT INTO prism_data (epoch,action_id,player_id,world_id,block_id,block_subid,old_block_id,old_block_subid,x,y,z) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                        "INSERT INTO "+prefix+"data (epoch,action_id,player_id,world_id,block_id,block_subid,old_block_id,old_block_subid,x,y,z) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                         Statement.RETURN_GENERATED_KEYS );
 
                 for( Handler a : actions ){
@@ -489,7 +491,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
         return null;
 	}
 	
-	
 	/**
      * 
      * @param keys
@@ -510,7 +511,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
 
         try {
             conn.setAutoCommit( false );
-            s = conn.prepareStatement( "INSERT INTO prism_data_extra (data_id,data) VALUES (?,?)" );
+            s = conn.prepareStatement( "INSERT INTO "+prefix+"data_extra (data_id,data) VALUES (?,?)" );
             int i = 0;
             while ( keys.next() ) {
 
@@ -521,7 +522,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
 
                 // @todo should not happen
                 if( i >= extraDataQueue.size() ) {
-                    Prism.log( "Skipping extra data for prism_data.id " + keys.getInt( 1 )
+                    Prism.log( "Skipping extra data for "+prefix+"data.id " + keys.getInt( 1 )
                             + " because the queue doesn't have data for it." );
                     continue;
                 }
@@ -579,7 +580,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
         try {
 
             conn = dbc();
-            s = conn.prepareStatement( "SELECT action_id, action FROM prism_actions" );
+            s = conn.prepareStatement( "SELECT action_id, action FROM "+prefix+"actions" );
             rs = s.executeQuery();
 
             while ( rs.next() ) {
@@ -622,7 +623,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
         try {
 
             conn = dbc();
-            s = conn.prepareStatement( "INSERT INTO prism_actions (action) VALUES (?)", Statement.RETURN_GENERATED_KEYS );
+            s = conn.prepareStatement( "INSERT INTO "+prefix+"actions (action) VALUES (?)", Statement.RETURN_GENERATED_KEYS );
             s.setString( 1, actionName );
             s.executeUpdate();
 
@@ -662,7 +663,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
         try {
 
             conn = dbc();
-            s = conn.prepareStatement( "SELECT world_id, world FROM prism_worlds" );
+            s = conn.prepareStatement( "SELECT world_id, world FROM "+prefix+"worlds" );
             rs = s.executeQuery();
 
             while ( rs.next() ) {
@@ -701,7 +702,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
         try {
 
             conn = dbc();
-            s = conn.prepareStatement( "INSERT INTO prism_worlds (world) VALUES (?)", Statement.RETURN_GENERATED_KEYS );
+            s = conn.prepareStatement( "INSERT INTO "+prefix+"worlds (world) VALUES (?)", Statement.RETURN_GENERATED_KEYS );
             s.setString( 1, worldName );
             s.executeUpdate();
 
@@ -730,10 +731,8 @@ public class MysqlStorageAdapter implements StorageAdapter {
         }
     }
 
-    
     /**
      * 
-     * @param playername
      */
     public long getMinimumChunkingKey() {
         int id = 0;
@@ -743,7 +742,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
         try {
 
             conn = dbc();
-            s = conn.prepareStatement( "SELECT MIN(id) FROM prism_data" );
+            s = conn.prepareStatement( "SELECT MIN(id) FROM " + prefix + "_data" );
             s.executeQuery();
             rs = s.getResultSet();
 
@@ -772,7 +771,6 @@ public class MysqlStorageAdapter implements StorageAdapter {
 
     /**
      * 
-     * @param playername
      */
     public long getMaximumChunkingKey() {
         int id = 0;
@@ -782,7 +780,7 @@ public class MysqlStorageAdapter implements StorageAdapter {
         try {
 
             conn = dbc();
-            s = conn.prepareStatement( "SELECT id FROM prism_data ORDER BY id DESC LIMIT 1;" );
+            s = conn.prepareStatement( "SELECT id FROM "+prefix+"data ORDER BY id DESC LIMIT 1;" );
             s.executeQuery();
             rs = s.getResultSet();
 
