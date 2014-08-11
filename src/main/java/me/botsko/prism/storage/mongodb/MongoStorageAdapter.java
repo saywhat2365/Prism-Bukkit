@@ -377,7 +377,7 @@ public class MongoStorageAdapter implements StorageAdapter {
         // Blocks
         if( !parameters.getBlockFilters().isEmpty() ){
             BasicDBList or = new BasicDBList();
-            for ( final Entry<Integer, Byte> entry : parameters.getBlockFilters().entrySet() ) {
+            for ( final Entry<Integer, Short> entry : parameters.getBlockFilters().entrySet() ) {
                 if( entry.getValue() == 0 ){
                     or.add( new BasicDBObject("block_id",entry.getKey()) );
                 } else {
