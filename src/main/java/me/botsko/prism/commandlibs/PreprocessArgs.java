@@ -4,7 +4,7 @@ import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.QueryParameters;
 import me.botsko.prism.actionlibs.QuerySession;
 import me.botsko.prism.actionlibs.QueryParameters.MatchRule;
-import me.botsko.prism.appliers.PrismProcessType;
+import me.botsko.prism.actionlibs.QuerySession.MatchedParam;
 import me.botsko.prism.parameters.PrismParameterHandler;
 
 import org.bukkit.Bukkit;
@@ -20,7 +20,7 @@ public class PreprocessArgs {
     /**
      *
      */
-    public static QueryParameters extractQueryFromCommand( QuerySession session, CallInfo call ) throws IllegalArgumentException {
+    public static void extractQueryFromCommand( QuerySession session, CallInfo call ) throws IllegalArgumentException {
 
         // Start query
         final QueryParameters parameters = session.newQuery();
@@ -29,24 +29,16 @@ public class PreprocessArgs {
         parameters.setLimit( Prism.config.getInt( "prism.queries.lookup-max-results" ) );
         parameters.setPerPage( Prism.config.getInt( "prism.queries.default-results-per-page" ) );
 
-        // Load registered parameters
-        final HashMap<String, PrismParameterHandler> registeredParams = Prism.getParameters();
-
         // Store names of matched params/handlers
         final Set<String> foundArgsNames = new HashSet<String>();
         final List<MatchedParam> foundArgsList = new ArrayList<MatchedParam>();
 
         // Iterate arguments
         for ( int i = 1; i < call.getArgs().length; i++ ) {
-
             final String arg = call.getArg(i);
             if( arg.isEmpty() ) continue;
-
-            if ( parseParam().equals( ParseResult.NotFound ) ){
-                
-            }
+            parseParam( session, arg );
         }
-        session.setFoundArgs( foundArgsNames );
 
         // Reject no matches
         if( foundArgsList.isEmpty() ) {
@@ -56,7 +48,7 @@ public class PreprocessArgs {
         /**
          * Call default method for handlers *not* used
          */
-        for ( final Entry<String, PrismParameterHandler> entry : registeredParams.entrySet() ) {
+        for ( final Entry<String, PrismParameterHandler> entry : Prism.getParameters().entrySet() ) {
             if( !foundArgsNames.contains( entry.getKey().toLowerCase() ) ) {
                 entry.getValue().defaultTo( session );
             }
@@ -69,74 +61,47 @@ public class PreprocessArgs {
             final PrismParameterHandler handler = matchedParam.getHandler();
             handler.process( session, matchedParam.getArg() );
         }
-
-        return parameters;
-        
     }
 
     /**
      * 
-     * @param plugin
-     * @param sender
-     * @param parameters
-     * @param registeredParams
-     * @param foundArgsNames
-     * @param foundArgsList
+     * @param session
      * @param arg
-     * @return
      */
-    private static ParseResult parseParam(){
-        ParseResult result = ParseResult.NotFound;
-
+    private static void parseParam( QuerySession session, String arg ){
+        
         // Match command argument to parameter handler
-        for ( final Entry<String, PrismParameterHandler> entry : registeredParams.entrySet() ) {
+        for ( final Entry<String, PrismParameterHandler> entry : Prism.getParameters().entrySet() ) {
             PrismParameterHandler parameterHandler = entry.getValue();
-            if (!parameterHandler.applicable(arg, sender)) {
+            if (!parameterHandler.applicable(arg, session.getSender())){
                 continue;
             }
-            if( !parameterHandler.hasPermission(arg, sender) ) {
-                result = ParseResult.NoPermission;
-                continue;
+            if( !parameterHandler.hasPermission(arg, session.getSender()) ){
+                throw new IllegalArgumentException("No permission for parameter '" + arg + "', skipped.");
             }
-            result = ParseResult.Found;
-            foundArgsList.add( new MatchedParam(parameterHandler, arg ) );
-            foundArgsNames.add( parameterHandler.getName().toLowerCase() );
+            session.addFoundArgument( new MatchedParam(parameterHandler, arg ) );
             break;
         }
-
-        // Reject argument that doesn't match anything
-        if( result == ParseResult.NotFound ) {
-            // We support an alternate player syntax so that people
-            // can use the tab-complete
-            // feature of minecraft. Using p: prevents it.
-            final Player autoFillPlayer = plugin.getServer().getPlayer( arg );
-            if( autoFillPlayer != null ) {
-                // Match
-                if( arg.startsWith( "!" ) ) {
-                    parameters.setPlayerMatchRule( MatchRule.EXCLUDE );
-                }
-                // Find player
-                OfflinePlayer player = Bukkit.getOfflinePlayer( arg.replace( "!", "" ) );
-                if( player != null ){
-                    result = ParseResult.Found;
-                    parameters.addPlayer( player );
-                }
+        
+        // We support an alternate player syntax so that people
+        // can use the tab-complete
+        // feature of minecraft. Using p: prevents it.
+        final Player autoFillPlayer = Bukkit.getServer().getPlayer( arg );
+        if( autoFillPlayer != null ){
+            // Match
+            if( arg.startsWith( "!" ) ){
+                session.getQuery().setPlayerMatchRule( MatchRule.EXCLUDE );
+            }
+            // Find player
+            OfflinePlayer player = Bukkit.getOfflinePlayer( arg.replace( "!", "" ) );
+            if( player != null ){
+                session.getQuery().addPlayer( player );
+                return;
             }
         }
-
-        switch (result) {
-            case NotFound:
-                if (sender != null)
-                    sender.sendMessage(Prism.messenger.playerError("Unrecognized parameter '" + arg + "."));
-                break;
-            case NoPermission:
-                if (sender != null)
-                    sender.sendMessage(Prism.messenger.playerError("No permission for parameter '" + arg + "', skipped."));
-                break;
-            default:
-                break;
-        }
-        return result;
+        
+        throw new IllegalArgumentException("Unrecognized parameter '" + arg + ".");
+        
     }
 
     /**
@@ -182,37 +147,5 @@ public class PreprocessArgs {
         }
 
         return null;
-    }
-
-    /**
-	 * 
-	 */
-    private static class MatchedParam {
-        private final PrismParameterHandler handler;
-        private final String arg;
-
-        public MatchedParam(PrismParameterHandler handler, String arg) {
-            this.handler = handler;
-            this.arg = arg;
-        }
-
-        public PrismParameterHandler getHandler() {
-            return handler;
-        }
-
-        public String getArg() {
-            return arg;
-        }
-    }
-
-    /**
-     * 
-     * @author botskonet
-     *
-     */
-    private enum ParseResult {
-        NotFound,
-        NoPermission,
-        Found
     }
 }

@@ -5,6 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import me.botsko.prism.commandlibs.CallInfo;
+import me.botsko.prism.commandlibs.PreprocessArgs;
+import me.botsko.prism.parameters.PrismParameterHandler;
+
 import org.bukkit.command.CommandSender;
 
 public class QuerySession {
@@ -12,7 +16,7 @@ public class QuerySession {
     protected final CommandSender sender;
     protected QueryParameters query;
     protected List<CommandSender> shareWithPlayers = new ArrayList<CommandSender>();
-    protected Set<String> foundArgumentNames = new HashSet<String>();
+    protected Set<MatchedParam> foundArguments = new HashSet<MatchedParam>();
     
     /**
      * 
@@ -21,6 +25,16 @@ public class QuerySession {
     public QuerySession( CommandSender sender ){
         this.sender = sender;
         shareWithPlayers.add( sender );
+    }
+    
+    /**
+     * 
+     * @param sender
+     * @param call
+     */
+    public QuerySession( CommandSender sender, CallInfo call ){
+        this(sender);
+        PreprocessArgs.extractQueryFromCommand( this, call );
     }
     
     /**
@@ -64,12 +78,20 @@ public class QuerySession {
         return shareWithPlayers;
     }
     
+//    /**
+//     * 
+//     * @param foundArgumentNames
+//     */
+//    public void setFoundArgs( Set<MatchedParam> foundArgumentNames ){
+//        this.foundArguments = foundArgumentNames;
+//    }
+    
     /**
-     * 
-     * @param foundArgumentNames
+     * Arguments matched in a user command are recorded here
+     * @param arg
      */
-    public void setFoundArgs( Set<String> foundArgumentNames ){
-        this.foundArgumentNames = foundArgumentNames;
+    public void addFoundArgument( MatchedParam arg ){
+        foundArguments.add( arg );
     }
     
     
@@ -95,5 +117,28 @@ public class QuerySession {
               defaultsReminder += " " + d;
           }
       }
+    }
+    
+    
+    /**
+     * 
+     */
+    public static class MatchedParam {
+        
+        private final PrismParameterHandler handler;
+        private final String arg;
+
+        public MatchedParam(PrismParameterHandler handler, String arg) {
+            this.handler = handler;
+            this.arg = arg;
+        }
+
+        public PrismParameterHandler getHandler() {
+            return handler;
+        }
+
+        public String getArg() {
+            return arg;
+        }
     }
 }

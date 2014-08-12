@@ -40,14 +40,7 @@ public class LookupCommand implements SubHandler {
     public void handle(final CallInfo call){
         
         // Create a new command/query session
-        final QuerySession session = new QuerySession( call.getSender() );
-        
-        
-
-//        // Process and validate all of the arguments
-//        final QueryParameters parameters = PreprocessArgs.process( plugin, call.getSender(), call.getArgs(),
-//                PrismProcessType.LOOKUP, 1, !plugin.getConfig().getBoolean( "prism.queries.never-use-defaults" ) );
-//        if( parameters == null ) { return; }
+        final QuerySession session = new QuerySession( call.getSender(), call );
 
         /**
          * Run the lookup itself in an async task so the lookup query isn't done
@@ -55,7 +48,7 @@ public class LookupCommand implements SubHandler {
          */
         plugin.getServer().getScheduler().runTaskAsynchronously( plugin, new Runnable() {
             @Override
-            public void run() {
+            public void run(){
 
                 final ActionsQuery aq = new ActionsQuery();
                 final QueryResult results = aq.lookup( session );
