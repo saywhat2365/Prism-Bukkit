@@ -37,7 +37,7 @@ public class TimeTaken {
      * @param eventname
      */
     public void recordTimedEvent(String eventname) {
-        if( !plugin.getConfig().getBoolean( "prism.debug" ) )
+        if( !Prism.config.getBoolean( "prism.debug" ) )
             return;
         eventsTimed.put( getTimestamp(), eventname );
     }
@@ -64,7 +64,7 @@ public class TimeTaken {
     public void printTimeRecord() {
 
         // record timed events to log
-        if( plugin.getConfig().getBoolean( "prism.debug" ) ) {
+        if( Prism.config.getBoolean( "prism.debug" ) ) {
             final TreeMap<Long, String> timers = Prism.eventTimer.getEventsTimedList();
             if( timers.size() > 0 ) {
                 long lastTime = 0;

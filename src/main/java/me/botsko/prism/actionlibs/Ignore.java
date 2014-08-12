@@ -39,9 +39,9 @@ public class Ignore {
     @SuppressWarnings("unchecked")
     public Ignore(Prism plugin) {
         this.plugin = plugin;
-        ignore_players = (List<String>) plugin.getConfig().getList( "prism.ignore.players" );
-        ignore_worlds = (List<String>) plugin.getConfig().getList( "prism.ignore.worlds" );
-        ignore_creative = plugin.getConfig().getBoolean( "prism.ignore.players-in-creative" );
+        ignore_players = (List<String>) Prism.config.getList( "prism.ignore.players" );
+        ignore_worlds = (List<String>) Prism.config.getList( "prism.ignore.worlds" );
+        ignore_creative = Prism.config.getBoolean( "prism.ignore.players-in-creative" );
     }
 
     /**
@@ -56,7 +56,7 @@ public class Ignore {
         if( actionTypeName.contains( "prism" ) ) { return true; }
 
         // Should we ignore this action type?
-        if( ( TypeUtils.subStrOccurences( actionTypeName, "-" ) == 1 && !plugin.getConfig().getBoolean(
+        if( ( TypeUtils.subStrOccurences( actionTypeName, "-" ) == 1 && !Prism.config.getBoolean(
                 "prism.tracking." + actionTypeName ) ) ) {
             // Prism.debug("Ignoring action type " + actionTypeName);
             return false;
@@ -89,7 +89,7 @@ public class Ignore {
         if( !event( actionTypeName, player.getWorld() ) ) { return false; }
 
         // Does the player have perms to ignore this action type?
-        if( plugin.getConfig().getBoolean( "prism.ignore.enable-perm-nodes" )
+        if( Prism.config.getBoolean( "prism.ignore.enable-perm-nodes" )
                 && player.hasPermission( "prism.ignore.tracking." + actionTypeName ) ) {
             Prism.debug( "Player has permission node to ignore " + actionTypeName );
             return false;

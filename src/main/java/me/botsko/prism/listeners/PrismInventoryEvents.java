@@ -45,7 +45,7 @@ public class PrismInventoryEvents implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryPickupItem(final InventoryPickupItemEvent event) {
 
-        if( !plugin.getConfig().getBoolean( "prism.track-hopper-item-events" ) )
+        if( !Prism.config.getBoolean( "prism.track-hopper-item-events" ) )
             return;
 
         if( !Prism.getIgnore().event( "item-pickup" ) )
@@ -69,8 +69,8 @@ public class PrismInventoryEvents implements Listener {
         // Someone cancelled this before we did
         if( event.isCancelled() ) { return; }
 
-        if( !plugin.getConfig().getBoolean( "prism.tracking.item-insert" )
-                && !plugin.getConfig().getBoolean( "prism.tracking.item-remove" ) )
+        if( !Prism.config.getBoolean( "prism.tracking.item-insert" )
+                && !Prism.config.getBoolean( "prism.tracking.item-remove" ) )
             return;
 
         // Get container
@@ -98,8 +98,8 @@ public class PrismInventoryEvents implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onInventoryClick(final InventoryClickEvent event) {
 
-        if( !plugin.getConfig().getBoolean( "prism.tracking.item-insert" )
-                && !plugin.getConfig().getBoolean( "prism.tracking.item-remove" ) )
+        if( !Prism.config.getBoolean( "prism.tracking.item-insert" )
+                && !Prism.config.getBoolean( "prism.tracking.item-remove" ) )
             return;
 
         Location containerLoc = null;

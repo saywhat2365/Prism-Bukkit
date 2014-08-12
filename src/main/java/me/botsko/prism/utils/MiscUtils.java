@@ -70,15 +70,15 @@ public class MiscUtils {
      * @param results
      * @return
      */
-    public static String paste_results(Prism prism, String results) {
+    public static String paste_results( String results ){
 
         final String prismWebUrl = "https://pste.me/";
 
-        if( !prism.getConfig().getBoolean( "prism.paste.enable" ) ) { return Prism.messenger
+        if( !Prism.config.getBoolean( "prism.paste.enable" ) ) { return Prism.messenger
                 .playerError( "PSTE.me paste bin support is currently disabled by config." ); }
 
-        final String apiUsername = prism.getConfig().getString( "prism.paste.username" );
-        final String apiKey = prism.getConfig().getString( "prism.paste.api-key" );
+        final String apiUsername = Prism.config.getString( "prism.paste.username" );
+        final String apiKey = Prism.config.getString( "prism.paste.api-key" );
 
         if( !apiKey.matches( "[0-9a-z]+" ) ) { return Prism.messenger.playerError( "Invalid API key." ); }
 

@@ -1,7 +1,6 @@
 package me.botsko.prism.commands;
 
 import me.botsko.prism.Prism;
-import me.botsko.prism.actionlibs.MatchRule;
 import me.botsko.prism.actionlibs.QueryParameters;
 import me.botsko.prism.actionlibs.RecordingManager;
 import me.botsko.prism.actionlibs.RecordingQueue;
@@ -183,7 +182,7 @@ public class ReportCommand implements SubHandler {
 
         // Process and validate all of the arguments
         final QueryParameters parameters = PreprocessArgs.process( plugin, call.getSender(), call.getArgs(),
-                PrismProcessType.LOOKUP, 3, !plugin.getConfig().getBoolean( "prism.queries.never-use-defaults" ) );
+                PrismProcessType.LOOKUP, 3, !Prism.config.getBoolean( "prism.queries.never-use-defaults" ) );
         if( parameters == null ) {
             call.getSender().sendMessage(
                     Prism.messenger.playerError( "You must specify parameters, at least one player." ) );
@@ -291,7 +290,7 @@ public class ReportCommand implements SubHandler {
 
         // Process and validate all of the arguments
         final QueryParameters parameters = PreprocessArgs.process( plugin, call.getSender(), call.getArgs(),
-                PrismProcessType.LOOKUP, 3, !plugin.getConfig().getBoolean( "prism.queries.never-use-defaults" ) );
+                PrismProcessType.LOOKUP, 3, !Prism.config.getBoolean( "prism.queries.never-use-defaults" ) );
         if( parameters == null ) { return; }
 
         // No actions

@@ -75,7 +75,7 @@ public class DeleteCommand implements SubHandler {
 
         // Process and validate all of the arguments
         final QueryParameters parameters = PreprocessArgs.process( plugin, call.getSender(), call.getArgs(),
-                PrismProcessType.DELETE, 1, !plugin.getConfig().getBoolean( "prism.queries.never-use-defaults" ) );
+                PrismProcessType.DELETE, 1, !Prism.config.getBoolean( "prism.queries.never-use-defaults" ) );
         if( parameters == null ) { return; }
         parameters.setStringFromRawArgs( call.getArgs(), 1 );
 
@@ -110,7 +110,7 @@ public class DeleteCommand implements SubHandler {
             call.getSender()
                     .sendMessage( Prism.messenger.playerSubduedHeaderMsg( "Purging data..." + defaultsReminder ) );
 
-            int purge_tick_delay = plugin.getConfig().getInt( "prism.purge.batch-tick-delay" );
+            int purge_tick_delay = Prism.config.getInt( "prism.purge.batch-tick-delay" );
             if( purge_tick_delay < 1 ) {
                 purge_tick_delay = 20;
             }

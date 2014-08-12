@@ -7,6 +7,8 @@ import me.botsko.prism.commandlibs.SubHandler;
 import me.botsko.prism.events.BlockStateChange;
 import me.botsko.prism.events.PrismBlocksDrainEvent;
 import me.botsko.prism.utils.BlockUtils;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
@@ -15,27 +17,13 @@ import java.util.List;
 public class DrainCommand implements SubHandler {
 
     /**
-	 * 
-	 */
-    private final Prism plugin;
-
-    /**
-     * 
-     * @param plugin
-     * @return
-     */
-    public DrainCommand(Prism plugin) {
-        this.plugin = plugin;
-    }
-
-    /**
      * Handle the command
      */
     @Override
     public void handle(CallInfo call) {
 
         String drain_type = "";
-        int radius = plugin.getConfig().getInt( "prism.drain.default-radius" );
+        int radius = Prism.config.getInt( "prism.drain.default-radius" );
         if( call.getArgs().length == 3 ) {
             if( call.getArg( 1 ).equalsIgnoreCase( "water" ) || call.getArg( 1 ).equalsIgnoreCase( "lava" ) ) {
                 drain_type = call.getArg( 1 );
@@ -91,13 +79,16 @@ public class DrainCommand implements SubHandler {
 
             // Trigger the event
             final PrismBlocksDrainEvent event = new PrismBlocksDrainEvent( blockStateChanges, call.getPlayer(), radius );
-            plugin.getServer().getPluginManager().callEvent( event );
+            Bukkit.getServer().getPluginManager().callEvent( event );
 
         } else {
             call.getPlayer().sendMessage( Prism.messenger.playerError( "Nothing found to drain within that radius." ) );
         }
     }
 
+    /**
+     * 
+     */
     @Override
     public List<String> handleComplete(CallInfo call) {
         return null;
@@ -112,24 +103,18 @@ public class DrainCommand implements SubHandler {
         if( TypeUtils.isNumeric( radius_arg ) ) {
             final int _tmp_radius = Integer.parseInt( radius_arg );
             if( _tmp_radius > 0 ) {
-                if( _tmp_radius > plugin.getConfig().getInt( "prism.drain.max-radius" ) ) {
+                if( _tmp_radius > Prism.config.getInt( "prism.drain.max-radius" ) ) {
                     call.getPlayer().sendMessage( Prism.messenger.playerError( "Radius exceeds max set in config." ) );
                     return 0;
                 } else {
                     return _tmp_radius;
                 }
             } else {
-                call.getPlayer()
-                        .sendMessage(
-                                Prism.messenger
-                                        .playerError( "Radius must be greater than zero. Or leave it off to use the default. Use /prism ? for help." ) );
+                call.getPlayer().sendMessage(Prism.messenger.playerError( "Radius must be greater than zero. Or leave it off to use the default. Use /prism ? for help." ) );
                 return 0;
             }
         } else {
-            call.getPlayer()
-                    .sendMessage(
-                            Prism.messenger
-                                    .playerError( "Radius must be a number. Or leave it off to use the default. Use /prism ? for help." ) );
+            call.getPlayer().sendMessage(Prism.messenger.playerError( "Radius must be a number. Or leave it off to use the default. Use /prism ? for help." ) );
             return 0;
         }
     }

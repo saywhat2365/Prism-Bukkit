@@ -38,7 +38,7 @@ public class RestoreCommand implements SubHandler {
     public void handle(final CallInfo call) {
 
         final QueryParameters parameters = PreprocessArgs.process( plugin, call.getSender(), call.getArgs(),
-                PrismProcessType.RESTORE, 1, !plugin.getConfig().getBoolean( "prism.queries.never-use-defaults" ) );
+                PrismProcessType.RESTORE, 1, !Prism.config.getBoolean( "prism.queries.never-use-defaults" ) );
         if( parameters == null ) { return; }
         parameters.setProcessType( PrismProcessType.RESTORE );
         parameters.setStringFromRawArgs( call.getArgs(), 1 );

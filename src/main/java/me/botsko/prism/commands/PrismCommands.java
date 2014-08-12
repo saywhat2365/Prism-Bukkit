@@ -29,24 +29,24 @@ public class PrismCommands extends Executor {
          * /prism about
          */
         addSub( new String[] { "about", "default" }, "prism.help" ).allowConsole()
-                .setHandler( new AboutCommand( prism ) );
+                .setHandler( new AboutCommand() );
 
         /**
          * /prism lookup
          */
         addSub( new String[] { "lookup", "l" }, "prism.lookup" ).allowConsole().setMinArgs( 1 )
-                .setHandler( new LookupCommand( prism ) );
+                .setHandler( new LookupCommand() );
 
         /**
          * /prism near
          */
-        addSub( "near", "prism.lookup" ).setHandler( new NearCommand( prism ) );
+        addSub( "near", "prism.lookup" ).setHandler( new NearCommand() );
 
         /**
          * /prism page [page]
          */
         addSub( new String[] { "page", "pg" }, new String[] { "prism.lookup.paginate", "prism.lookup" } )
-                .allowConsole().setMinArgs( 1 ).setHandler( new PageCommand( prism ) );
+                .allowConsole().setMinArgs( 1 ).setHandler( new PageCommand() );
 
         /**
          * /prism wand
@@ -76,12 +76,12 @@ public class PrismCommands extends Executor {
         /**
          * /prism ext
          */
-        addSub( "ex", "prism.extinguish" ).setHandler( new ExtinguishCommand( prism ) );
+        addSub( "ex", "prism.extinguish" ).setHandler( new ExtinguishCommand() );
 
         /**
          * /prism drain
          */
-        addSub( "drain", "prism.drain" ).setHandler( new DrainCommand( prism ) );
+        addSub( "drain", "prism.drain" ).setHandler( new DrainCommand() );
 
         /**
          * /prism preview (params)

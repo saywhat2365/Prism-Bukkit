@@ -44,7 +44,7 @@ public class ResetmyCommand implements SubHandler {
             return;
         }
 
-        if( !plugin.getConfig().getBoolean( "prism.wands.allow-user-override" ) ) {
+        if( !Prism.config.getBoolean( "prism.wands.allow-user-override" ) ) {
             call.getPlayer().sendMessage(
                     Prism.messenger.playerError( "Sorry, but personalizing the wand is currently not allowed." ) );
         }

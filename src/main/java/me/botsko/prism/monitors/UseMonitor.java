@@ -40,8 +40,8 @@ public class UseMonitor {
     @SuppressWarnings("unchecked")
     public UseMonitor(Prism plugin) {
         this.plugin = plugin;
-        blocksToAlertOnPlace = (ArrayList<String>) plugin.getConfig().getList( "prism.alerts.uses.item-placement" );
-        blocksToAlertOnBreak = (ArrayList<String>) plugin.getConfig().getList( "prism.alerts.uses.item-break" );
+        blocksToAlertOnPlace = (ArrayList<String>) Prism.config.getList( "prism.alerts.uses.item-placement" );
+        blocksToAlertOnBreak = (ArrayList<String>) Prism.config.getList( "prism.alerts.uses.item-break" );
         resetEventsQueue();
     }
 
@@ -65,13 +65,13 @@ public class UseMonitor {
         }
 
         if(count <= 5) {
-            if(plugin.getConfig().getBoolean("prism.alerts.uses.log-to-console")) {
+            if(Prism.config.getBoolean("prism.alerts.uses.log-to-console")) {
                 plugin.alertPlayers( null, msg );
                 Prism.log( msg );
             }
 
             // Log to commands
-            List<String> commands = plugin.getConfig().getStringList("prism.alerts.uses.log-commands");
+            List<String> commands = Prism.config.getStringList("prism.alerts.uses.log-commands");
             MiscUtils.dispatchAlert(msg, commands);
         }
     }
@@ -84,10 +84,10 @@ public class UseMonitor {
     protected boolean checkFeatureShouldProceed(Player player) {
 
         // Ensure enabled
-        if( !plugin.getConfig().getBoolean( "prism.alerts.uses.enabled" ) ) { return false; }
+        if( !Prism.config.getBoolean( "prism.alerts.uses.enabled" ) ) { return false; }
 
         // Ignore players who would see the alerts
-        if( plugin.getConfig().getBoolean( "prism.alerts.uses.ignore-staff" ) && player.hasPermission( "prism.alerts" ) ) { return false; }
+        if( Prism.config.getBoolean( "prism.alerts.uses.ignore-staff" ) && player.hasPermission( "prism.alerts" ) ) { return false; }
 
         // Ignore certain ranks
         if( player.hasPermission( "prism.bypass-use-alerts" ) ) { return false; }

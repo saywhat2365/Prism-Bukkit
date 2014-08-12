@@ -55,7 +55,7 @@ public class WorldEditBridge {
             procType = "lookup";
         }
 
-        final int maxRadius = plugin.getConfig().getInt( "prism.queries.max-" + procType + "-radius" );
+        final int maxRadius = Prism.config.getInt( "prism.queries.max-" + procType + "-radius" );
         if( maxRadius != 0 && ( lRadius > maxRadius || wRadius > maxRadius || hRadius > maxRadius )
                 && !player.hasPermission( "prism.override-max-" + procType + "-radius" ) ) {
             return false;

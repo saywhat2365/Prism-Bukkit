@@ -38,7 +38,7 @@ public class RecordingTask implements Runnable {
     	
     	if( !RecordingQueue.getQueue().isEmpty() ) {
     	    
-    	    int perBatch = plugin.getConfig().getInt( "prism.database.actions-per-insert-batch" );
+    	    int perBatch = Prism.config.getInt( "prism.database.actions-per-insert-batch" );
             if( perBatch < 1 )
                 perBatch = 1000;
     		
@@ -87,10 +87,10 @@ public class RecordingTask implements Runnable {
     protected int getTickDelayForNextBatch() {
 
         // If we have too many rejected connections, increase the schedule
-        if( RecordingManager.failedDbConnectionCount > plugin.getConfig().getInt(
+        if( RecordingManager.failedDbConnectionCount > Prism.config.getInt(
                 "prism.database.max-failures-before-wait" ) ) { return RecordingManager.failedDbConnectionCount * 20; }
 
-        int recorder_tick_delay = plugin.getConfig().getInt( "prism.queue-empty-tick-delay" );
+        int recorder_tick_delay = Prism.config.getInt( "prism.queue-empty-tick-delay" );
         if( recorder_tick_delay < 1 ) {
             recorder_tick_delay = 3;
         }

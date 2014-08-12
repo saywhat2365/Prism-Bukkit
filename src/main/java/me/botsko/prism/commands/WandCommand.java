@@ -56,10 +56,10 @@ public class WandCommand implements SubHandler {
         Prism.playersWithActiveTools.remove( call.getPlayer().getName() );
 
         // Determine default mode
-        String mode = plugin.getConfig().getString( "prism.wands.default-mode" );
+        String mode = Prism.config.getString( "prism.wands.default-mode" );
 
         // Check if the player has a personal override
-        if( plugin.getConfig().getBoolean( "prism.wands.allow-user-override" ) ) {
+        if( Prism.config.getBoolean( "prism.wands.allow-user-override" ) ) {
             final String personalMode = Prism.getSettingsStorageAdapter().getSetting( "wand.mode", call.getPlayer() );
             if( personalMode != null ) {
                 mode = personalMode;
@@ -71,13 +71,13 @@ public class WandCommand implements SubHandler {
         byte item_subid = -1;
         String toolKey = null;
         if( mode.equals( "item" ) ) {
-            toolKey = plugin.getConfig().getString( "prism.wands.default-item-mode-id" );
+            toolKey = Prism.config.getString( "prism.wands.default-item-mode-id" );
         } else if( mode.equals( "block" ) ) {
-            toolKey = plugin.getConfig().getString( "prism.wands.default-block-mode-id" );
+            toolKey = Prism.config.getString( "prism.wands.default-block-mode-id" );
         }
 
         // Check if the player has a personal override
-        if( plugin.getConfig().getBoolean( "prism.wands.allow-user-override" ) ) {
+        if( Prism.config.getBoolean( "prism.wands.allow-user-override" ) ) {
             final String personalToolKey = Prism.getSettingsStorageAdapter().getSetting( "wand.item", call.getPlayer() );
             if( personalToolKey != null ) {
                 toolKey = personalToolKey;
@@ -231,7 +231,7 @@ public class WandCommand implements SubHandler {
             Prism.debug( "Wand activated for player - mode: " + mode + " Item:" + item_id + ":" + item_subid );
 
             // Move any existing item to the hand, otherwise give it to them
-            if( plugin.getConfig().getBoolean( "prism.wands.auto-equip" ) ) {
+            if( Prism.config.getBoolean( "prism.wands.auto-equip" ) ) {
                 if( !InventoryUtils.moveItemToHand( inv, item_id, item_subid ) ) {
                     // Store the item they're holding, if any
                     wand.setOriginallyHeldItem( inv.getItemInHand() );

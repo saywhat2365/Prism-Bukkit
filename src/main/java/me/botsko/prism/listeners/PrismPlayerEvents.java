@@ -64,8 +64,8 @@ public class PrismPlayerEvents implements Listener {
     @SuppressWarnings("unchecked")
     public PrismPlayerEvents(Prism plugin) {
         this.plugin = plugin;
-        illegalCommands = (List<String>) plugin.getConfig().getList( "prism.alerts.illegal-commands.commands" );
-        ignoreCommands = (List<String>) plugin.getConfig().getList( "prism.do-not-track.commands" );
+        illegalCommands = (List<String>) Prism.config.getList( "prism.alerts.illegal-commands.commands" );
+        ignoreCommands = (List<String>) Prism.config.getList( "prism.do-not-track.commands" );
     }
 
     /**
@@ -82,7 +82,7 @@ public class PrismPlayerEvents implements Listener {
         final String[] cmdArgs = cmd.split( " " );
         final String primaryCmd = cmdArgs[0].substring( 1 );
 
-        if( plugin.getConfig().getBoolean( "prism.alerts.illegal-commands.enabled" ) ) {
+        if( Prism.config.getBoolean( "prism.alerts.illegal-commands.enabled" ) ) {
             if( illegalCommands.contains( primaryCmd ) ) {
                 final String msg = player.getName() + " attempted an illegal command: " + primaryCmd + ". Originally: "
                         + cmd;
@@ -90,12 +90,12 @@ public class PrismPlayerEvents implements Listener {
                 plugin.alertPlayers( null, msg );
                 event.setCancelled( true );
                 // Log to console
-                if( plugin.getConfig().getBoolean( "prism.alerts.illegal-commands.log-to-console" ) ) {
+                if( Prism.config.getBoolean( "prism.alerts.illegal-commands.log-to-console" ) ) {
                     Prism.log( msg );
                 }
 
                 // Log to commands
-                List<String> commands = plugin.getConfig().getStringList("prism.alerts.illegal-commands.log-commands");
+                List<String> commands = Prism.config.getStringList("prism.alerts.illegal-commands.log-commands");
                 MiscUtils.dispatchAlert(msg, commands);
             }
         }
@@ -127,7 +127,7 @@ public class PrismPlayerEvents implements Listener {
             return;
 
         String ip = null;
-        if( plugin.getConfig().getBoolean( "prism.track-player-ip-on-join" ) ) {
+        if( Prism.config.getBoolean( "prism.track-player-ip-on-join" ) ) {
             ip = player.getAddress().getAddress().getHostAddress().toString();
         }
 
@@ -229,7 +229,7 @@ public class PrismPlayerEvents implements Listener {
         RecordingQueue.addToQueue( ActionFactory.createBlockChange(cause, spot.getLocation(), spot.getTypeId(), spot.getData(),
                 newId, (byte) 0, player.getName()) );
 
-        if( plugin.getConfig().getBoolean( "prism.alerts.uses.lava" ) && event.getBucket() == Material.LAVA_BUCKET
+        if( Prism.config.getBoolean( "prism.alerts.uses.lava" ) && event.getBucket() == Material.LAVA_BUCKET
                 && !player.hasPermission( "prism.alerts.use.lavabucket.ignore" )
                 && !player.hasPermission( "prism.alerts.ignore" ) ) {
             plugin.useMonitor.alertOnItemUse( player, "poured lava" );
@@ -453,7 +453,7 @@ public class PrismPlayerEvents implements Listener {
             }
         }
 
-        if( !plugin.getConfig().getBoolean( "prism.tracking.crop-trample" ) )
+        if( !Prism.config.getBoolean( "prism.tracking.crop-trample" ) )
             return;
 
         if( block != null && event.getAction() == Action.PHYSICAL ) {

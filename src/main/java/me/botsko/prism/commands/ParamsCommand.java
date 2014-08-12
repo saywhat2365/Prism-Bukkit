@@ -18,6 +18,9 @@ public class ParamsCommand implements SubHandler {
         help( call.getSender() );
     }
 
+    /**
+     * 
+     */
     @Override
     public List<String> handleComplete(CallInfo call) {
         return null;

@@ -37,7 +37,7 @@ public class RollbackCommand implements SubHandler {
     public void handle(final CallInfo call) {
 
         final QueryParameters parameters = PreprocessArgs.process( plugin, call.getSender(), call.getArgs(),
-                PrismProcessType.ROLLBACK, 1, !plugin.getConfig().getBoolean( "prism.queries.never-use-defaults" ) );
+                PrismProcessType.ROLLBACK, 1, !Prism.config.getBoolean( "prism.queries.never-use-defaults" ) );
         if( parameters == null ) { return; }
         parameters.setProcessType( PrismProcessType.ROLLBACK );
         parameters.setStringFromRawArgs( call.getArgs(), 1 );

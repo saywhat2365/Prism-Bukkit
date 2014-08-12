@@ -58,7 +58,7 @@ public class OreMonitor {
      */
     public void processAlertsFromBlock(final Player player, final Block block) {
 
-        if( !plugin.getConfig().getBoolean( "prism.alerts.ores.enabled" ) ) { return; }
+        if( !Prism.config.getBoolean( "prism.alerts.ores.enabled" ) ) { return; }
 
         if( player == null || player.getGameMode() == null || player.getGameMode().equals( GameMode.CREATIVE ) ) { return; }
 
@@ -115,12 +115,12 @@ public class OreMonitor {
                             plugin.alertPlayers( null, TypeUtils.colorize( msg ) );
 
                             // Log to console
-                            if( plugin.getConfig().getBoolean( "prism.alerts.ores.log-to-console" ) ) {
+                            if( Prism.config.getBoolean( "prism.alerts.ores.log-to-console" ) ) {
                                 Prism.log( msg );
                             }
 
                             // Log to commands
-                            List<String> commands = plugin.getConfig().getStringList("prism.alerts.ores.log-commands");
+                            List<String> commands = Prism.config.getStringList("prism.alerts.ores.log-commands");
                             MiscUtils.dispatchAlert(msg, commands);
                         }
                     }

@@ -33,7 +33,7 @@ public class PrismCustomEvents implements Listener {
     @SuppressWarnings("unchecked")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCustomPlayerAction(final PrismCustomPlayerActionEvent event) {
-        final ArrayList<String> allowedPlugins = (ArrayList<String>) plugin.getConfig().getList(
+        final ArrayList<String> allowedPlugins = (ArrayList<String>) Prism.config.getList(
                 "prism.tracking.api.allowed-plugins" );
         if( allowedPlugins.contains( event.getPluginName() ) ) {
             RecordingQueue.addToQueue( ActionFactory.createPlayer(event.getActionTypeName(), event.getPlayer(),

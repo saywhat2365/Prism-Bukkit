@@ -83,7 +83,7 @@ public class InspectorWand extends QueryWandBase implements Wand {
                 // Ignoring any actions via config?
                 if( params.getActionTypes().size() == 0 ) {
                     @SuppressWarnings("unchecked")
-                    final ArrayList<String> ignoreActions = (ArrayList<String>) plugin.getConfig().getList("prism.wands.inspect.ignore-actions");
+                    final ArrayList<String> ignoreActions = (ArrayList<String>) Prism.config.getList("prism.wands.inspect.ignore-actions");
                     if( ignoreActions != null && !ignoreActions.isEmpty() ) {
                         for ( final String ignore : ignoreActions ) {
                             params.addActionType( ignore );
@@ -111,7 +111,7 @@ public class InspectorWand extends QueryWandBase implements Wand {
                     for ( final me.botsko.prism.actions.Handler a : results.getPaginatedActionResults() ) {
                         final ActionMessage am = new ActionMessage( a );
                         if( parameters.hasFlag( Flag.EXTENDED )
-                                || plugin.getConfig().getBoolean( "prism.messenger.always-show-extended" ) ) {
+                                || Prism.config.getBoolean( "prism.messenger.always-show-extended" ) ) {
                             am.showExtended();
                         }
                         player.sendMessage( Prism.messenger.playerMsg( am.getMessage() ) );

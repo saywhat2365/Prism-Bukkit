@@ -361,7 +361,7 @@ public class PrismBlockEvents implements Listener {
             final Player player = event.getPlayer();
 
             if( player != null ) {
-                if( cause.equals( "lighter" ) && plugin.getConfig().getBoolean( "prism.alerts.uses.lighter" )
+                if( cause.equals( "lighter" ) && Prism.config.getBoolean( "prism.alerts.uses.lighter" )
                         && !player.hasPermission( "prism.alerts.use.lighter.ignore" )
                         && !player.hasPermission( "prism.alerts.ignore" ) ) {
                     plugin.useMonitor.alertOnItemUse( player, "used a lighter" );
@@ -393,7 +393,7 @@ public class PrismBlockEvents implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPistonExtend(final BlockPistonExtendEvent event) {
 
-        if( plugin.getConfig().getBoolean( "prism.alerts.vanilla-xray.enabled" ) ) {
+        if( Prism.config.getBoolean( "prism.alerts.vanilla-xray.enabled" ) ) {
             final Block noPlayer = event.getBlock().getRelative( event.getDirection() )
                     .getRelative( event.getDirection() ).getRelative( BlockFace.DOWN );
             for ( final Player pl : plugin.getServer().getOnlinePlayers() ) {

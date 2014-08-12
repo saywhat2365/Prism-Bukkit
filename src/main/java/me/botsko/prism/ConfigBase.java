@@ -34,7 +34,7 @@ public class ConfigBase {
 	 *
 	 */
     public FileConfiguration getConfig() {
-        config = plugin.getConfig();
+        config = Prism.config;
         return config;
     }
 

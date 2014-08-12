@@ -20,10 +20,10 @@ public class PreprocessArgs {
     /**
      *
      */
-    public static void extractQueryFromCommand( QuerySession session, CallInfo call ) throws IllegalArgumentException {
+    public static QueryParameters extractQueryFromCommand( QuerySession session, CallInfo call ) throws IllegalArgumentException {
 
         // Start query
-        final QueryParameters parameters = session.newQuery();
+        final QueryParameters parameters = new QueryParameters();
 
         // Define pagination/process type
         parameters.setLimit( Prism.config.getInt( "prism.queries.lookup-max-results" ) );
@@ -61,6 +61,9 @@ public class PreprocessArgs {
             final PrismParameterHandler handler = matchedParam.getHandler();
             handler.process( session, matchedParam.getArg() );
         }
+        
+        return parameters;
+        
     }
 
     /**

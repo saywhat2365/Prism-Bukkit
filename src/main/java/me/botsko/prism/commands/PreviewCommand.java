@@ -1,7 +1,6 @@
 package me.botsko.prism.commands;
 
 import me.botsko.prism.Prism;
-import me.botsko.prism.actionlibs.ActionsQuery;
 import me.botsko.prism.actionlibs.QueryParameters;
 import me.botsko.prism.actionlibs.QueryResult;
 import me.botsko.prism.appliers.*;

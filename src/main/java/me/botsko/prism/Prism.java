@@ -56,7 +56,7 @@ public class Prism extends JavaPlugin {
      */
     private Prism prism;
     private static String plugin_name;
-    private String plugin_version;
+    private static String plugin_version;
     private static MaterialAliases items;
     private Language language;
     private static Logger log = Logger.getLogger( "Minecraft" );
@@ -241,8 +241,8 @@ public class Prism extends JavaPlugin {
      * 
      * @return
      */
-    public String getPrismVersion() {
-        return this.plugin_version;
+    public static String getPrismVersion() {
+        return plugin_version;
     }
 
     /**

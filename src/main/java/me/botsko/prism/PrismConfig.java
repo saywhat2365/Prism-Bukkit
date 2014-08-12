@@ -24,7 +24,7 @@ public class PrismConfig extends ConfigBase {
     @Override
     public FileConfiguration getConfig() {
 
-        config = plugin.getConfig();
+        config = Prism.config;
 
         // set defaults
         config.addDefault( "prism.debug", false );

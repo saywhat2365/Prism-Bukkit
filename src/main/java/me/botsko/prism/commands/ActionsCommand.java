@@ -23,6 +23,9 @@ public class ActionsCommand implements SubHandler {
         help( call.getSender() );
     }
 
+    /**
+     * 
+     */
     @Override
     public List<String> handleComplete(CallInfo call) {
         return null;
@@ -57,8 +60,7 @@ public class ActionsCommand implements SubHandler {
             actionList += shortName + ( i < shortNames.size() ? ", " : "" );
             i++;
         }
-        sender.sendMessage( Prism.messenger.playerMsg( ChatColor.LIGHT_PURPLE + "Action Aliases:" + ChatColor.WHITE
-                + " " + actionList ) );
+        sender.sendMessage( Prism.messenger.playerMsg( ChatColor.LIGHT_PURPLE + "Action Aliases:" + ChatColor.WHITE + " " + actionList ) );
 
         // Build display of full actions
         actionList = "";
@@ -69,8 +71,7 @@ public class ActionsCommand implements SubHandler {
             actionList += entry.getKey() + ( i < actions.size() ? ", " : "" );
             i++;
         }
-        sender.sendMessage( Prism.messenger.playerMsg( ChatColor.LIGHT_PURPLE + "Full Actions:" + ChatColor.GRAY + " "
-                + actionList ) );
+        sender.sendMessage( Prism.messenger.playerMsg( ChatColor.LIGHT_PURPLE + "Full Actions:" + ChatColor.GRAY + " " + actionList ) );
 
     }
 }

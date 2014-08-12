@@ -18,6 +18,9 @@ public class HelpCommand implements SubHandler {
         help( call.getSender() );
     }
 
+    /**
+     * 
+     */
     @Override
     public List<String> handleComplete(CallInfo call) {
         return null;
@@ -31,7 +34,6 @@ public class HelpCommand implements SubHandler {
     protected void help(CommandSender sender) {
 
         sender.sendMessage( Prism.messenger.playerHeaderMsg( ChatColor.GOLD + "--- Basic Usage ---" ) );
-
         sender.sendMessage( Prism.messenger.playerHelp( "i", "Toggle the inspector wand." ) );
         sender.sendMessage( Prism.messenger.playerHelp( "(l|lookup) (params)", "Search the database." ) );
         sender.sendMessage( Prism.messenger.playerHelp( "tp (#|id:#)", "Teleport to a lookup result." ) );

@@ -211,7 +211,7 @@ public class Preview implements Previewable {
                     plugin.notifyNearby( player, parameters.getSelectedRegion().getAverageRadius(), player.getDisplayName() + " is performing a "
                             + processType.name().toLowerCase() + " near you." );
                     // Inform staff
-                    if( plugin.getConfig().getBoolean( "prism.alerts.alert-staff-to-applied-process" ) ) {
+                    if( Prism.config.getBoolean( "prism.alerts.alert-staff-to-applied-process" ) ) {
                         final String cmd = parameters.getOriginalCommand();
                         if( cmd != null ) {
                             plugin.alertPlayers( player, ChatColor.WHITE + processType.name().toLowerCase() + " by "
@@ -239,7 +239,7 @@ public class Preview implements Previewable {
             @Override
             public void run() {
 
-                if( plugin.getConfig().getBoolean( "prism.debug" ) ) {
+                if( Prism.config.getBoolean( "prism.debug" ) ) {
                     Prism.debug( "World change queue size: " + worldChangeQueue.size() );
                 }
 
@@ -488,7 +488,7 @@ public class Preview implements Previewable {
         Prism.eventTimer.recordTimedEvent( "applier function complete" );
 
         // record timed events to log
-        if( plugin.getConfig().getBoolean( "prism.debug" ) ) {
+        if( Prism.config.getBoolean( "prism.debug" ) ) {
             // Flush timed data
             Prism.eventTimer.printTimeRecord();
             Prism.debug( "Changes: " + changes_applied_count );
