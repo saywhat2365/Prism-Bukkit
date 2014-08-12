@@ -1,8 +1,9 @@
 package me.botsko.prism.parameters;
 
 import me.botsko.elixr.TypeUtils;
-import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QuerySession;
 import me.botsko.prism.commandlibs.Flag;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public class FlagParameter implements PrismParameterHandler {
 	 * 
 	 */
     @Override
-    public void process(QueryParameters query, String parameter, CommandSender sender) {
+    public void process( QuerySession session, String parameter ) {
         final String[] flagComponents = parameter.substring( 1 ).split( "=" );
         Flag flag;
         try {
@@ -50,26 +51,26 @@ public class FlagParameter implements PrismParameterHandler {
         } catch ( final IllegalArgumentException ex ) {
             throw new IllegalArgumentException( "Flag -" + flagComponents[0] + " not found", ex );
         }
-        if( !( query.hasFlag( flag ) ) ) {
+        if( !( session.getQuery().hasFlag( flag ) ) ) {
 
-            query.addFlag( flag );
+            session.getQuery().addFlag( flag );
 
             // Flag has a value
             if( flagComponents.length > 1 ) {
                 if( flag.equals( Flag.PER_PAGE ) ) {
                     if( TypeUtils.isNumeric( flagComponents[1] ) ) {
-                        query.setPerPage( Integer.parseInt( flagComponents[1] ) );
+                        session.getQuery().setPerPage( Integer.parseInt( flagComponents[1] ) );
                     } else {
                         throw new IllegalArgumentException(
                                 "Per-page flag value must be a number. Use /prism ? for help." );
                     }
                 } else if( flag.equals( Flag.SHARE ) ) {
                     for ( final String sharePlayer : flagComponents[1].split( "," ) ) {
-                        if( sharePlayer.equals( sender.getName() ) ) { throw new IllegalArgumentException(
+                        if( sharePlayer.equals( session.getSender().getName() ) ) { throw new IllegalArgumentException(
                                 "You can't share lookup results with yourself!" ); }
                         final Player shareWith = Bukkit.getServer().getPlayer( sharePlayer );
                         if( shareWith != null ) {
-                            query.addSharedPlayer( shareWith );
+                            session.addSharedPlayer( shareWith );
                         } else {
                             throw new IllegalArgumentException( "Can't share with " + sharePlayer
                                     + ". Are they online?" );
@@ -84,10 +85,13 @@ public class FlagParameter implements PrismParameterHandler {
 	 * 
 	 */
     @Override
-    public void defaultTo(QueryParameters query, CommandSender sender) {
+    public void defaultTo( QuerySession session ){
 
     }
 
+    /**
+     * 
+     */
     @Override
     public List<String> tabComplete(String partialParameter, CommandSender sender) {
         final String[] flagComponents = partialParameter.substring( 1 ).split( "=", 2 );
@@ -129,6 +133,9 @@ public class FlagParameter implements PrismParameterHandler {
         return null;
     }
 
+    /**
+     * 
+     */
     @Override
     public boolean hasPermission( String parameter, Permissible permissible ) {
         final String[] flagComponents = parameter.substring( 1 ).split( "=" );

@@ -99,8 +99,8 @@ public class OreMonitor {
 
                         // Build params
                         final QueryParameters params = new QueryParameters();
-                        params.setWorld( player.getWorld().getName() );
-                        params.addSpecificBlockLocation( block.getLocation() );
+                        params.setWorld( player.getWorld() );
+                        params.addLocation( block.getLocation() );
                         params.addActionType( "block-place" );
 
                         final ActionsQuery aq = new ActionsQuery( plugin );

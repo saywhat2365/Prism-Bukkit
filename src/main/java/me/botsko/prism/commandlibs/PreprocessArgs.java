@@ -2,6 +2,7 @@ package me.botsko.prism.commandlibs;
 
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QuerySession;
 import me.botsko.prism.actionlibs.QueryParameters.MatchRule;
 import me.botsko.prism.appliers.PrismProcessType;
 import me.botsko.prism.parameters.PrismParameterHandler;
@@ -19,32 +20,14 @@ public class PreprocessArgs {
     /**
      *
      */
-    public static QueryParameters process(Prism plugin, CommandSender sender, String[] args,
-                                          PrismProcessType processType, int startAt, boolean useDefaults) {
-        return process(plugin, sender, args, processType, startAt, useDefaults, false);
-    }
-
-    /**
-     *
-     */
-    public static QueryParameters process(Prism plugin, CommandSender sender, String[] args,
-            PrismProcessType processType, int startAt, boolean useDefaults, boolean optional) {
-
-        // Check for player or sender
-        Player player = null;
-        if( sender != null && sender instanceof Player ) {
-            player = (Player) sender;
-        }
+    public static QueryParameters extractQueryFromCommand( QuerySession session, CallInfo call ) throws IllegalArgumentException {
 
         // Start query
-        final QueryParameters parameters = new QueryParameters();
-        parameters.setProcessType( processType );
+        final QueryParameters parameters = session.newQuery();
 
         // Define pagination/process type
-        if( parameters.getProcessType().equals( PrismProcessType.LOOKUP ) ) {
-            parameters.setLimit( plugin.getConfig().getInt( "prism.queries.lookup-max-results" ) );
-            parameters.setPerPage( plugin.getConfig().getInt( "prism.queries.default-results-per-page" ) );
-        }
+        parameters.setLimit( Prism.config.getInt( "prism.queries.lookup-max-results" ) );
+        parameters.setPerPage( Prism.config.getInt( "prism.queries.default-results-per-page" ) );
 
         // Load registered parameters
         final HashMap<String, PrismParameterHandler> registeredParams = Prism.getParameters();
@@ -53,38 +36,29 @@ public class PreprocessArgs {
         final Set<String> foundArgsNames = new HashSet<String>();
         final List<MatchedParam> foundArgsList = new ArrayList<MatchedParam>();
 
-        // Iterate all command arguments
-        if (args == null) {
-            return parameters;
+        // Iterate arguments
+        for ( int i = 1; i < call.getArgs().length; i++ ) {
+
+            final String arg = call.getArg(i);
+            if( arg.isEmpty() ) continue;
+
+            if ( parseParam().equals( ParseResult.NotFound ) ){
+                
+            }
         }
-
-        for ( int i = startAt; i < args.length; i++ ) {
-
-            final String arg = args[i];
-            if( arg.isEmpty() )
-                continue;
-
-            if (parseParam(plugin, sender, parameters, registeredParams, foundArgsNames, foundArgsList, arg) == ParseResult.NotFound)
-                return null;
-        }
-        parameters.setFoundArgs( foundArgsNames );
+        session.setFoundArgs( foundArgsNames );
 
         // Reject no matches
-        if( foundArgsList.isEmpty() && !optional ) {
-            if( sender != null )
-                sender.sendMessage( Prism.messenger
-                        .playerError( "You're missing valid parameters. Use /prism ? for assistance." ) );
-            return null;
+        if( foundArgsList.isEmpty() ) {
+            throw new IllegalArgumentException("No valid arguments were found.");
         }
 
         /**
          * Call default method for handlers *not* used
          */
-        if( useDefaults ) {
-            for ( final Entry<String, PrismParameterHandler> entry : registeredParams.entrySet() ) {
-                if( !foundArgsNames.contains( entry.getKey().toLowerCase() ) ) {
-                    entry.getValue().defaultTo( parameters, sender );
-                }
+        for ( final Entry<String, PrismParameterHandler> entry : registeredParams.entrySet() ) {
+            if( !foundArgsNames.contains( entry.getKey().toLowerCase() ) ) {
+                entry.getValue().defaultTo( session );
             }
         }
 
@@ -92,23 +66,12 @@ public class PreprocessArgs {
          * Send arguments to parameter handlers
          */
         for ( final MatchedParam matchedParam : foundArgsList ) {
-            try {
-                final PrismParameterHandler handler = matchedParam.getHandler();
-                handler.process( parameters, matchedParam.getArg(), sender );
-            } catch ( final IllegalArgumentException e ) {
-                if( sender != null )
-                    sender.sendMessage( Prism.messenger.playerError( e.getMessage() ) );
-                return null;
-            }
+            final PrismParameterHandler handler = matchedParam.getHandler();
+            handler.process( session, matchedParam.getArg() );
         }
 
-        // Player location
-        if( player != null && !plugin.getConfig().getBoolean( "prism.queries.never-use-defaults" )
-                && parameters.getPlayerLocation() == null
-                && ( parameters.getMaxLocation() == null || parameters.getMinLocation() == null ) ) {
-            parameters.setMinMaxVectorsFromPlayerLocation( player.getLocation() );
-        }
         return parameters;
+        
     }
 
     /**
@@ -122,7 +85,7 @@ public class PreprocessArgs {
      * @param arg
      * @return
      */
-    private static ParseResult parseParam(Prism plugin, CommandSender sender, QueryParameters parameters, HashMap<String, PrismParameterHandler> registeredParams, Set<String> foundArgsNames, List<MatchedParam> foundArgsList, String arg) {
+    private static ParseResult parseParam(){
         ParseResult result = ParseResult.NotFound;
 
         // Match command argument to parameter handler
@@ -164,8 +127,7 @@ public class PreprocessArgs {
         switch (result) {
             case NotFound:
                 if (sender != null)
-                    sender.sendMessage(Prism.messenger.playerError("Unrecognized parameter '" + arg
-                            + "'. Use /prism ? for help."));
+                    sender.sendMessage(Prism.messenger.playerError("Unrecognized parameter '" + arg + "."));
                 break;
             case NoPermission:
                 if (sender != null)

@@ -1,6 +1,7 @@
 package me.botsko.prism.parameters;
 
-import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QuerySession;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permissible;
 
@@ -78,20 +79,21 @@ public abstract class SimplePrismParameterHandler implements PrismParameterHandl
      * @param input
      * @param sender
      */
-    protected abstract void process(QueryParameters query, String alias, String input, CommandSender sender);
+    protected abstract void process( QuerySession session, String alias, String input );
 
     /**
 	 * 
 	 */
     @Override
-    public final void process(QueryParameters query, String parameter, CommandSender sender) {
+    public final void process( QuerySession session, String parameter ) {
         // Should never fail, applicable is called first
         final String[] split = parameter.split( ":", 2 );
         final String alias = split[0];
         final String input = split[1];
-        if( inputMatcher != null && !inputMatcher.matcher( input ).matches() ) { throw new IllegalArgumentException(
-                "Invalid syntax for parameter " + input ); }
-        process( query, alias, input, sender );
+        if( inputMatcher != null && !inputMatcher.matcher( input ).matches() ) {
+            throw new IllegalArgumentException("Invalid syntax for parameter " + input );
+        }
+        process( session, alias, input );
     }
 
     /**
@@ -110,7 +112,7 @@ public abstract class SimplePrismParameterHandler implements PrismParameterHandl
 	 * 
 	 */
     @Override
-    public void defaultTo(QueryParameters query, CommandSender sender) {
+    public void defaultTo( QuerySession session ) {
 
     }
 

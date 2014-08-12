@@ -1,6 +1,7 @@
 package me.botsko.prism.parameters;
 
-import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QuerySession;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permissible;
 
@@ -14,9 +15,9 @@ public interface PrismParameterHandler {
 
     public boolean applicable(String parameter, CommandSender sender);
 
-    public void process(QueryParameters query, String parameter, CommandSender sender);
+    public void process( QuerySession session, String parameter );
 
-    public void defaultTo(QueryParameters query, CommandSender sender);
+    public void defaultTo( QuerySession session );
 
     /**
      * Complete a param after the `:`

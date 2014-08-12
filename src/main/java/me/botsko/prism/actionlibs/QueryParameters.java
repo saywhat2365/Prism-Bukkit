@@ -29,13 +29,15 @@ public class QueryParameters implements Cloneable {
     protected World world = null;
     protected CuboidRegion selectionRegion = null;
     protected List<Location> specificLocations = new ArrayList<Location>();
-    protected List<ActionType> actionTypes = new ArrayList<ActionType>();
+    protected List<String> actionTypes = new ArrayList<String>();
     protected MatchRule actionsMatchRule = MatchRule.INCLUDE;
     protected List<BlockFilter> blockFilters = new ArrayList<BlockFilter>();
     protected List<OfflinePlayer> players = new ArrayList<OfflinePlayer>();
     protected MatchRule playersMatchRule = MatchRule.INCLUDE;
     protected Date minDate = null;
     protected Date maxDate = null;
+    protected long minChunkingId;
+    protected long maxChunkingId;
     
     // Query configs
     protected PrismProcessType processType;
@@ -147,12 +149,12 @@ public class QueryParameters implements Cloneable {
     }
     
     // ACTIONS
-    
+
     /**
      * Limit query to specific Prism action types.
      * @param type
      */
-    public void addActionType( ActionType type ) throws IllegalArgumentException {
+    public void addActionType( String type ) throws IllegalArgumentException {
         if( type == null ){
             throw new IllegalArgumentException("Action type may not be null");
         }
@@ -163,7 +165,7 @@ public class QueryParameters implements Cloneable {
      * Returns action types specified
      * @return
      */
-    public List<ActionType> getActionTypes(){
+    public List<String> getActionTypes(){
         return actionTypes;
     }
     
@@ -400,24 +402,7 @@ public class QueryParameters implements Cloneable {
     }
     
 
-//  public Set<String> getFoundArgs() {
-//      return foundArgs;
-//  }
-//  public void setFoundArgs(Set<String> foundArgs) {
-//      this.foundArgs = foundArgs;
-//  }
- 
 
-
-
-
-//    public void addDefaultUsed(String d) {
-//        defaultsUsed.add( d );
-//    }
-
-//    public ArrayList<String> getDefaultsUsed() {
-//        return defaultsUsed;
-//    }
 
 
 //    public void setStringFromRawArgs(String[] args, int start) {
@@ -430,42 +415,45 @@ public class QueryParameters implements Cloneable {
 //        original_command = params;
 //    }
 
- 
-//    public String getOriginalCommand() {
-//        return original_command;
-//    }
+    // CHUNKING
 
+    /**
+     * Sets a minimum ID for purge chunking
+     * @param minId
+     */
+    public void setMinChunkingKey( long minId ) {
+        this.minChunkingId = minId;
+    }
+
+    /**
+     * Returns a minimum ID for purge chunking
+     * @param minId
+     */
+    public long getMinChunkingKey() {
+        return this.minChunkingId;
+    }
+
+    /**
+     * Sets a maximum ID for purge chunking
+     * @param minId
+     */
+    public void setMaxChunkingKey(long maxId) {
+        this.maxChunkingId = maxId;
+    }
+
+    /**
+     * Returns a maximum ID for purge chunking
+     * @param minId
+     */
+    public long getMaxChunkingKey() {
+        return this.maxChunkingId;
+    }
     
-//    public ArrayList<CommandSender> getSharedPlayers() {
-//        return shared_players;
-//    }
-//
-//    
-//    public void addSharedPlayer(CommandSender sender) {
-//        this.shared_players.add( sender );
-//    }
-//    
-//
-//    
-//    
-//    public void setMinChunkingKey(long minId) {
-//        this.minChunkingId = minId;
-//    }
-//
-//    
-//    public long getMinChunkingKey() {
-//        return this.minChunkingId;
-//    }
-//
-//    
-//    public void setMaxChunkingKey(long maxId) {
-//        this.maxChunkingId = maxId;
-//    }
-//
-//    
-//    public long getMaxChunkingKey() {
-//        return this.maxChunkingId;
-//    }
+    // INFORMATIONAL SHORTCUTS
+    
+    public boolean isGlobal(){
+        return ( selectionRegion == null && world == null && specificLocations.size() == 0 ); 
+    }
 
 //    /**
 //	 * 

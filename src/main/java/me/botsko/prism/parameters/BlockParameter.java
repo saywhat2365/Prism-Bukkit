@@ -5,6 +5,8 @@ import me.botsko.elixr.MaterialAliases;
 import me.botsko.elixr.TypeUtils;
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QuerySession;
+
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class BlockParameter extends SimplePrismParameterHandler {
 	 * 
 	 */
     @Override
-    public void process(QueryParameters query, String alias, String input, CommandSender sender) {
+    public void process( QuerySession session, String alias, String input ) {
         final String[] blocks = input.split( "," );
 
         if( blocks.length > 0 ) {
@@ -33,7 +35,7 @@ public class BlockParameter extends SimplePrismParameterHandler {
                 if( b.contains( ":" ) && b.length() >= 3 ) {
                     final String[] ids = b.split( ":" );
                     if( ids.length == 2 && TypeUtils.isNumeric( ids[0] ) && TypeUtils.isNumeric( ids[1] ) ) {
-                        query.addBlockFilter( Integer.parseInt( ids[0] ), Short.parseShort( ids[1] ) );
+                        session.getQuery().addBlockFilter( Integer.parseInt( ids[0] ), Short.parseShort( ids[1] ) );
                     } else {
                         throw new IllegalArgumentException( "Invalid block name '" + b + "'. Try /pr ? for help" );
                     }
@@ -41,7 +43,7 @@ public class BlockParameter extends SimplePrismParameterHandler {
 
                     // It's id without a subid
                     if( TypeUtils.isNumeric( b ) ) {
-                        query.addBlockFilter( Integer.parseInt( b ), (short) 0 );
+                        session.getQuery().addBlockFilter( Integer.parseInt( b ), (short) 0 );
                     } else {
 
                         // Lookup the item name, get the ids
@@ -53,9 +55,9 @@ public class BlockParameter extends SimplePrismParameterHandler {
                                     // If we really care about the sub id
                                     // because it's a whole different item
                                     if( ItemUtils.dataValueUsedForSubitems( ids[0] ) ) {
-                                        query.addBlockFilter( ids[0], (short) ids[1] );
+                                        session.getQuery().addBlockFilter( ids[0], (short) ids[1] );
                                     } else {
-                                        query.addBlockFilter( ids[0], (short) 0 );
+                                        session.getQuery().addBlockFilter( ids[0], (short) 0 );
                                     }
                                 }
                             }

@@ -2,6 +2,8 @@ package me.botsko.prism.parameters;
 
 import me.botsko.elixr.TypeUtils;
 import me.botsko.prism.actionlibs.QueryParameters;
+import me.botsko.prism.actionlibs.QuerySession;
+
 import org.bukkit.command.CommandSender;
 
 import java.util.regex.Pattern;
@@ -19,10 +21,10 @@ public class IdParameter extends SimplePrismParameterHandler {
 	 * 
 	 */
     @Override
-    public void process(QueryParameters query, String alias, String input, CommandSender sender) {
-
-        if( !TypeUtils.isNumeric( input ) ) { throw new IllegalArgumentException(
-                "ID must be a number. Use /prism ? for help." ); }
-        query.setId( Integer.parseInt( input ) );
+    public void process( QuerySession session, String alias, String input ) {
+        if( !TypeUtils.isNumeric( input ) ) { 
+            throw new IllegalArgumentException("ID must be a number. Use /prism ? for help." );
+        }
+        session.getQuery().setId( Integer.parseInt( input ) );
     }
 }

@@ -52,8 +52,6 @@ public class InspectorWand extends QueryWandBase implements Wand {
      */
     protected void showLocationHistory(final Player player, final Location loc) {
 
-        final Block block = loc.getBlock();
-
         /**
          * Run the lookup itself in an async task so the lookup query isn't done
          * on the main thread
@@ -76,6 +74,7 @@ public class InspectorWand extends QueryWandBase implements Wand {
                 params.addLocation( loc );
 
                 // Do we need a second location? (For beds, doors, etc)
+                final Block block = loc.getBlock();
                 final Block sibling = me.botsko.elixr.BlockUtils.getSiblingForDoubleLengthBlock( block );
                 if( sibling != null ) {
                     params.addLocation( sibling.getLocation() );
@@ -84,8 +83,7 @@ public class InspectorWand extends QueryWandBase implements Wand {
                 // Ignoring any actions via config?
                 if( params.getActionTypes().size() == 0 ) {
                     @SuppressWarnings("unchecked")
-                    final ArrayList<String> ignoreActions = (ArrayList<String>) plugin.getConfig().getList(
-                            "prism.wands.inspect.ignore-actions" );
+                    final ArrayList<String> ignoreActions = (ArrayList<String>) plugin.getConfig().getList("prism.wands.inspect.ignore-actions");
                     if( ignoreActions != null && !ignoreActions.isEmpty() ) {
                         for ( final String ignore : ignoreActions ) {
                             params.addActionType( ignore );
@@ -93,15 +91,11 @@ public class InspectorWand extends QueryWandBase implements Wand {
                         params.setActionTypesMatchRule( MatchRule.EXCLUDE );
                     }
                 }
-                boolean timeDefault = false;
-                for ( final String _default : params.getDefaultsUsed() ) {
-                    if( _default.startsWith( "t:" ) ) {
-                        timeDefault = true;
-                    }
-                }
-                if( timeDefault ) {
-                    params.setIgnoreTime( true );
-                }
+//                for ( final String _default : params.getDefaultsUsed() ) {
+//                    if( _default.startsWith( "t:" ) ) {
+//                        timeDefault = true;
+//                    }
+//                }
 
                 // Query
                 final ActionsQuery aq = new ActionsQuery( plugin );

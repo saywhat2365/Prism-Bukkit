@@ -47,8 +47,7 @@ public class PurgeTask implements Runnable {
      * 
      * @param plugin
      */
-    public PurgeTask(Prism plugin, CopyOnWriteArrayList<QueryParameters> paramList, int purge_tick_delay, long minId,
-            long maxId, PurgeCallback callback) {
+    public PurgeTask(Prism plugin, CopyOnWriteArrayList<QueryParameters> paramList, int purge_tick_delay, long minId, long maxId, PurgeCallback callback){
         this.plugin = plugin;
         this.paramList = paramList;
         this.purge_tick_delay = purge_tick_delay;
@@ -66,7 +65,7 @@ public class PurgeTask implements Runnable {
         if( paramList.isEmpty() )
             return;
 
-        final ActionsQuery aq = new ActionsQuery( plugin );
+        final ActionsQuery aq = new ActionsQuery();
 
         // Pull the next-in-line purge param
         final QueryParameters param = paramList.get( 0 );
@@ -94,7 +93,7 @@ public class PurgeTask implements Runnable {
             cycle_complete = true;
         }
 
-        Prism.debug( "------------------- " + param.getOriginalCommand() );
+        Prism.debug( "------------------- " + session.getOriginalCommand() );
         Prism.debug( "minChunkKey: " + minId );
         Prism.debug( "maxChunkKey: " + maxId );
         Prism.debug( "newMinId: " + newMinId );

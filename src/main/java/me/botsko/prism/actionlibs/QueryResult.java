@@ -15,7 +15,7 @@ public class QueryResult {
     /**
 	 * 
 	 */
-    protected final QueryParameters parameters;
+    protected final QuerySession session;
 
     /**
 	 * 
@@ -51,10 +51,10 @@ public class QueryResult {
      * 
      * @param actions
      */
-    public QueryResult(List<Handler> actions, QueryParameters parameters) {
+    public QueryResult( List<Handler> actions, QuerySession session ){
 
         this.actionResults = actions;
-        this.parameters = parameters;
+        this.session = session;
 
         setQueryTime();
 
@@ -99,8 +99,8 @@ public class QueryResult {
     /**
      * @return the parameters
      */
-    public QueryParameters getParameters() {
-        return parameters;
+    public QuerySession getSession() {
+        return session;
     }
 
     /**
