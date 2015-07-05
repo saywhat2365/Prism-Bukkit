@@ -11,8 +11,8 @@ import me.botsko.prism.appliers.ChangeResult;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
-import org.bukkit.craftbukkit.libs.com.google.gson.GsonBuilder;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -193,7 +193,7 @@ public class GenericAction implements Handler {
         final SimpleDateFormat date = new SimpleDateFormat( "yy/MM/dd" );
         this.display_date = date.format( action_time );
 
-        final SimpleDateFormat time = new SimpleDateFormat( "h:m:sa" );
+        final SimpleDateFormat time = new SimpleDateFormat( "hh:mm:ssa" );
         this.display_time = time.format( action_time );
 
     }

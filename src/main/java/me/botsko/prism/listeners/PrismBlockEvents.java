@@ -1,12 +1,9 @@
 package me.botsko.prism.listeners;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import me.botsko.prism.Prism;
 import me.botsko.prism.actionlibs.ActionFactory;
 import me.botsko.prism.actionlibs.RecordingQueue;
-
+import me.botsko.prism.utils.BlockUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -18,19 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.block.BlockFadeEvent;
-import org.bukkit.event.block.BlockFormEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.block.LeavesDecayEvent;
-import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
@@ -38,6 +23,9 @@ import org.bukkit.material.Sign;
 import me.botsko.prism.utils.BlockUtils;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 // Cauldron end
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrismBlockEvents implements Listener {
 
@@ -99,7 +87,7 @@ public class PrismBlockEvents implements Listener {
      */
     protected void logBlockRelationshipsForBlock(String playername, Block block) {
 
-        if( block.getType().equals( Material.WOODEN_DOOR ) || block.getType().equals( Material.IRON_DOOR_BLOCK ) ) { return; }
+        if( BlockUtils.isDoor(block.getType()) ) { return; }
 
         // Find a list of all blocks above this block that we know will fall.
         final ArrayList<Block> falling_blocks = me.botsko.elixr.BlockUtils.findFallingBlocksAboveBlock( block );
@@ -374,10 +362,11 @@ public class PrismBlockEvents implements Listener {
             final Player player = event.getPlayer();
 
             if( player != null ) {
-                if( cause.equals( "lighter" ) && plugin.getConfig().getBoolean( "prism.alerts.uses.lighter" )
+                if( ( cause.equals( "lighter" ) || cause.equals( "fireball" ) )
+                        && plugin.getConfig().getBoolean( "prism.alerts.uses.lighter" )
                         && !player.hasPermission( "prism.alerts.use.lighter.ignore" )
                         && !player.hasPermission( "prism.alerts.ignore" ) ) {
-                    plugin.useMonitor.alertOnItemUse( player, "used a lighter" );
+                    plugin.useMonitor.alertOnItemUse( player, "used a " + cause );
                 }
             }
 
